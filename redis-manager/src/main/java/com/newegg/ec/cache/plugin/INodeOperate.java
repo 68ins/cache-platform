@@ -1,6 +1,7 @@
 package com.newegg.ec.cache.plugin;
 
 import com.newegg.ec.cache.plugin.basemodel.*;
+import net.sf.json.JSONObject;
 
 import java.util.List;
 
@@ -8,13 +9,12 @@ import java.util.List;
  * Created by lzz on 2018/4/20.
  */
 public interface INodeOperate{
-    boolean pullImage(List<String> ipList, String imageUrl);
-    boolean install(InstallParam installParam);
-    boolean start(StartParam startParam);
-    boolean stop(StopParam stopParam);
-    boolean restart(RestartParam restartParam);
-    boolean remove(RemovePram removePram);
+    boolean pullImage(JSONObject pullParam);
+    boolean install(JSONObject installParam);
+    boolean start(JSONObject startParam);
+    boolean stop(JSONObject stopParam);
+    boolean restart(JSONObject restartParam);
+    boolean remove(JSONObject removePram);
     List<String> getImageList();
-
     List<Node> getNodeList(int clusterId);
 }

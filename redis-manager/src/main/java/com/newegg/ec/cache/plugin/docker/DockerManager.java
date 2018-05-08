@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.*;
+import net.sf.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,35 +24,37 @@ public class DockerManager implements INodeOperate,INodeRequest {
         this.userId = userId;
     }
 
+
     @Override
-    public boolean pullImage(List<String> ipList, String imageUrl) {
+    public boolean pullImage(JSONObject pullParam) {
         return false;
     }
 
     @Override
-    public boolean install(InstallParam installParam) {
+    public boolean install(JSONObject installParam) {
         return false;
     }
 
     @Override
-    public boolean start(StartParam startParam) {
+    public boolean start(JSONObject startParam) {
         return false;
     }
 
     @Override
-    public boolean stop(StopParam stopParam) {
+    public boolean stop(JSONObject stopParam) {
         return false;
     }
 
     @Override
-    public boolean restart(RestartParam restartParam) {
+    public boolean restart(JSONObject restartParam) {
         return false;
     }
 
     @Override
-    public boolean remove(RemovePram removePram) {
+    public boolean remove(JSONObject removePram) {
         return false;
     }
+
 
     @Override
     public List<String> getImageList() {

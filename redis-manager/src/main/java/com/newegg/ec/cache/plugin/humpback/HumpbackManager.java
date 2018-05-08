@@ -5,11 +5,12 @@ import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
 import com.newegg.ec.cache.app.util.HttpUtil;
 import com.newegg.ec.cache.app.util.RequestUtil;
+import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
-import com.newegg.ec.cache.plugin.basemodel.*;
+import com.newegg.ec.cache.plugin.basemodel.Node;
+import com.newegg.ec.cache.plugin.basemodel.StartType;
 import net.sf.json.JSONObject;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ import java.util.concurrent.Future;
 @Component
 public class HumpbackManager implements INodeOperate,INodeRequest {
 
-    private static Logger logger= Logger.getLogger(HumpbackManager.class);
+    CommonLogger logger = new CommonLogger( HumpbackManager.class );
 
     static ExecutorService executorService = Executors.newFixedThreadPool(100);
     @Value("${cache.humpback.image}")
@@ -43,9 +44,10 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
 
     }
 
-
     @Override
-    public boolean pullImage(List<String> ipList, String imageUrl) {
+    public boolean pullImage(JSONObject pullParam) {
+        List<String> ipList = pullParam.getJSONArray("ipList");
+        String imageUrl = pullParam.getString("imageUrl");
         List<Future<Boolean>> futureList = new ArrayList<>();
         for(String ip : ipList){
             Future<Boolean> future = executorService.submit( new PullImageTask(ip, imageUrl) );
@@ -62,36 +64,44 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
     }
 
     @Override
-    public boolean install(InstallParam installParam) {
+    public boolean install(JSONObject installParam) {
         return false;
     }
 
     @Override
-    public boolean start(StartParam startParam) {
-        return false;
+    public boolean start(JSONObject startParam) {
+        String ip = startParam.getString("ip");
+        String containerId = startParam.getString("containerId");
+        return optionContainer(ip, containerId, StartType.start);
     }
 
     @Override
-    public boolean stop(StopParam stopParam) {
-        return false;
+    public boolean stop(JSONObject stopParam) {
+        String ip = stopParam.getString("ip");
+        String containerId = stopParam.getString("containerId");
+        return optionContainer(ip, containerId, StartType.stop);
     }
 
     @Override
-    public boolean restart(RestartParam restartParam) {
-        return false;
+    public boolean restart(JSONObject restartParam) {
+        stop(restartParam);
+        start(restartParam);
+        return true;
     }
 
-
     @Override
-    public boolean remove(RemovePram removePram) {
-        HumbackRemoveParam humbackRemoveParam = (HumbackRemoveParam) removePram;
+    public boolean remove(JSONObject removePram) {
+        System.out.println( removePram );
+        logger.websocket( removePram.toString() );
+        String ip = removePram.getString("ip");
+        String containerId = removePram.getString("containerId");
         try {
-            String url = getApiAddress( humbackRemoveParam.getIp() );
-            if( HttpClientUtil.getDeleteResponse(url, humbackRemoveParam.getContainerId() ) == null) {
+            String url = getApiAddress( ip );
+            if( HttpClientUtil.getDeleteResponse(url, containerId ) == null) {
                 return false;
             }
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("", e);
             return false;
         }
         return true;
@@ -152,12 +162,12 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
      * container option
      * @param ip
      * @param containerName
-     * @param option
+     * @param startType
      * @return
      */
-    public boolean optionContainer(String ip,String containerName, String option) {
+    public boolean optionContainer(String ip,String containerName, StartType startType) {
         JSONObject object = new JSONObject();
-        object.put("Action",option);
+        object.put("Action",startType);
         object.put("Container",containerName);
         try {
             String url = getApiAddress(ip)+"containers";
@@ -165,31 +175,11 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
                 return false;
             }
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("", e);
             return false;
         }
         return true;
     }
 
-    /**
-     * delete container
-     * @param ip
-     * @param containerName
-     * @return
-     *   1.containerId 不存在依然会正确返回delete success;
-     *   2.删除操作前需要先执行一次stop操作，不能正常删除，但是返回结果为true
-     */
-    public boolean deleteContainer(String ip, String containerName) {
-        try {
-            String url = getApiAddress(ip)+"containers";
-            if( HttpClientUtil.getDeleteResponse(url, containerName) == null) {
-                return false;
-            }
-        } catch (IOException e) {
-            logger.error(e);
-            return false;
-        }
-        return true;
-    }
 
 }

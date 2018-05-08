@@ -1,13 +1,12 @@
 package com.newegg.ec.cache.app.controller.websocket;
 
-import com.newegg.ec.cache.app.dao.IClusterCheckLogDao;
 import com.newegg.ec.cache.app.dao.IClusterDao;
-import com.newegg.ec.cache.app.dao.IUserDao;
 import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.Response;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.NetUtil;
 import com.newegg.ec.cache.app.util.RequestUtil;
+import com.newegg.ec.cache.core.logger.CommonLogger;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +18,13 @@ import java.util.List;
  */
 @Component
 public class CheckLogLogic {
+    private static CommonLogger logger = new CommonLogger( CheckLogLogic.class );
+
     @Resource
     private IClusterDao clusterDao;
 
     private String checkLog(String msg){
-        CreateClusterLogHandler.appendLog(String.valueOf( RequestUtil.getUser().getId() ), msg);
-        return msg + "<br>";
+        return logger.websocket(msg) + "<br>";
     }
 
     public  Response checkClusterName(String clusterName) {

@@ -1,6 +1,7 @@
 package com.newegg.ec.cache.plugin.humpback;
 
 import com.newegg.ec.cache.Application;
+import com.newegg.ec.cache.plugin.basemodel.StartType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,13 @@ public class HumpackOptionTest {
 
     @Test
     public void testoptionContainer() {
-        boolean result = humpback.optionContainer("172.16.35.219", "itemService_test_Log", "start");
+        boolean result = humpback.optionContainer("172.16.35.219", "itemService_test_Log", StartType.start);
         System.out.println("result "+result);
     }
 
 
     @Test
     public void testDelContainer() {
-        boolean stop = humpback.optionContainer("172.16.35.219", "itemService_test_Log", "stop");
-        if(stop){
-            boolean result = humpback.deleteContainer("172.16.35.219", "itemService_test_Log");
-            System.out.println(result);
-        }
+        boolean stop = humpback.optionContainer("172.16.35.219", "itemService_test_Log", StartType.stop);
     }
 }
