@@ -320,6 +320,28 @@ public class JedisUtil {
         return result;
     }
 
+    public static String getNodeid(String ip, int port){
+        Jedis jedis = new Jedis( ip , port);
+        String nodeid = null;
+        try {
+            String info = jedis.clusterNodes();
+            String[] lines = info.split("\n");
+            for(String line : lines){
+                if( line.contains("myself") ){
+                    System.out.println( line );
+                    String[] tmps = line.split(" ");
+                    nodeid = tmps[0];
+                    break;
+                }
+            }
+        }catch (Exception e){
+
+        }finally {
+            jedis.close();
+        }
+        return nodeid;
+    }
+
     /**
      * 发送 failover 信号
      * @param ip

@@ -10,7 +10,10 @@ import com.newegg.ec.cache.app.model.RedisQueryParam;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
 import java.util.Map;
@@ -77,9 +80,92 @@ public class RedisManager {
         return res;
     }
 
+    public boolean beSlave(String ip, int port, String masterId){
+        boolean res = false;
+        Jedis jedis = new Jedis(ip, port);
+        try {
+            jedis.clusterReplicate( masterId );
+            res = true;
+        }catch (Exception e){
+
+        }finally {
+            jedis.close();
+        }
+        return res;
+    }
+
+    public boolean clusterMeet(String slaveIp, int slavePort, String masterIp, int masterPort){
+        boolean res = false;
+        Jedis jedis = new Jedis( slaveIp, slavePort );
+        try {
+            jedis.clusterMeet( masterIp, masterPort );
+            res = true;
+        }catch (Exception e){
+
+        }finally {
+            jedis.close();
+        }
+        return res;
+    }
+
+    public Map<RedisNode, List<RedisNode>>  buildClusterMeet(Map<RedisNode, List<RedisNode>> ipMap){
+        Map<RedisNode, List<RedisNode>> ipMapRes = new HashedMap();
+        String currentAliableIp = null;
+        Integer currentAliablePort = null;
+        for(Map.Entry< RedisNode, List<RedisNode> > nodeItem : ipMap.entrySet() ){
+            try {
+                RedisNode master = nodeItem.getKey();
+                String masterIp = master.getIp();
+                int masterPort = master.getPort();
+                if( NetUtil.checkIpAndPort(masterIp, masterPort) ){
+                    if( StringUtils.isBlank( currentAliableIp ) || null == currentAliablePort ){
+                        currentAliableIp = masterIp;
+                        currentAliablePort = masterPort;
+                    }
+                    List<RedisNode> slaveList = nodeItem.getValue();
+                    ipMapRes.put(master, slaveList);
+                    for(RedisNode redisNode : slaveList){
+                        logger.websocket( redisNode.getIp() + ":" + redisNode.getPort() + " is meet cluster");
+                        clusterMeet( redisNode.getIp(), redisNode.getPort(), currentAliableIp, currentAliablePort );
+                        Thread.sleep(500);
+                    }
+                }else{
+                    logger.websocket( masterIp + ":" + masterPort + " master is install fail");
+                }
+            }catch (Exception e){
+
+            }
+        }
+        return ipMapRes;
+    }
+
+    public boolean buildClusterBeSlave(Map<RedisNode, List<RedisNode>> ipMap){
+        for(Map.Entry< RedisNode, List<RedisNode> > nodeItem : ipMap.entrySet() ){
+            try {
+                RedisNode master = nodeItem.getKey();
+                String masterIp = master.getIp();
+                int masterPort = master.getPort();
+                if( NetUtil.checkIpAndPort(masterIp, masterPort) ){
+                    String nodeId = JedisUtil.getNodeid(masterIp, masterPort);
+                    List<RedisNode> slaveList = nodeItem.getValue();
+                    for(RedisNode redisNode : slaveList){
+                        logger.websocket( redisNode.getIp() + ":" + redisNode.getPort() + " is be slave to " + masterIp + ":" + masterPort);
+                        beSlave( redisNode.getIp(), redisNode.getPort(), nodeId );
+                        Thread.sleep(500);
+                    }
+                }
+            }catch (Exception e){
+
+            }
+        }
+        return true;
+    }
+
     public boolean buildCluster(Map<RedisNode, List<RedisNode>> ipMap){
-        System.out.println( ipMap );
-        logger.websocket("haha");
+        logger.websocket("start meet all node to cluster");
+        buildClusterMeet( ipMap );
+        logger.websocket("start set slave for cluster");
+        buildClusterBeSlave( ipMap );
         return true;
     }
 }
