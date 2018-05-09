@@ -1,9 +1,13 @@
 package com.newegg.ec.cache.app.util;
 
+import com.newegg.ec.cache.app.model.Host;
+import com.newegg.ec.cache.app.model.RedisNode;
+import com.newegg.ec.cache.app.model.RedisNodeType;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.util.Slowlog;
+import sun.nio.ch.Net;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -374,38 +378,32 @@ public class JedisUtil {
         }
         return ipSet;
     }
-    public static Map<Map<String, String>, List<Map<String, String>>> getInstallNodeMap(String nodeStr){
-        Map<Map<String, String>, List<Map<String, String>>> resMap = new HashedMap();
-        Map<String, String> currentMaster = new HashedMap();
+    public static Map<RedisNode, List<RedisNode>> getInstallNodeMap(String nodeStr){
+        Map<RedisNode, List<RedisNode>> resMap = new HashedMap();
+        RedisNode currentMaster = new RedisNode();
         String[] nodeArr = nodeStr.split("\n");
         for(String node : nodeArr){
             try {
-                Map<String, String> nodeItem = new HashedMap();
+                RedisNode nodeItem = new RedisNode();
                 String[] tmpArr = node.split("\\s+");
                 if( tmpArr.length >= 1 ){
-                    nodeItem.put("host", tmpArr[0]);
-                    nodeItem.put("role", "slave");
+                    String hostStr = tmpArr[0];
+                    Host host = NetUtil.getHost( hostStr );
+                    nodeItem.setIp( host.getIp() );
+                    nodeItem.setPort( host.getPort() );
+                    nodeItem.setRole( RedisNodeType.slave );
                 }
                 if( tmpArr.length >= 2 ){
                     if( tmpArr[1].equals("master") ){
-                        nodeItem.put("role", "master");
+                        nodeItem.setRole( RedisNodeType.master );
                         currentMaster = nodeItem;
-                        if( tmpArr.length == 4 ){
-                            nodeItem.put("username", tmpArr[2]);
-                            nodeItem.put("password", tmpArr[3]);
-                        }
-                    }else{
-                        if( tmpArr.length == 3 ){
-                            nodeItem.put("username", tmpArr[1]);
-                            nodeItem.put("password", tmpArr[2]);
-                        }
                     }
                 }
                 if( resMap.get(currentMaster) == null ){
                     resMap.put(currentMaster, new ArrayList<>());
                 }
-                List<Map<String, String>> slaveList = resMap.get(currentMaster);
-                if( nodeItem.get("role").equals("slave") ){
+                List<RedisNode> slaveList = resMap.get(currentMaster);
+                if( nodeItem.getRole() == RedisNodeType.slave ){
                     slaveList.add(nodeItem);
                 }
             }catch (Exception ignore){

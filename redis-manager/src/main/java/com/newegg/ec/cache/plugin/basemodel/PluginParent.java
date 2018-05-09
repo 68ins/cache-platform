@@ -2,6 +2,7 @@ package com.newegg.ec.cache.plugin.basemodel;
 
 import com.newegg.ec.cache.app.component.RedisManager;
 import com.newegg.ec.cache.app.dao.IClusterDao;
+import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
 import net.sf.json.JSONObject;
@@ -24,7 +25,7 @@ public abstract class PluginParent {
 
     public boolean installTemplate(PluginParent pluginParent, JSONObject reqParam){
         String ipListStr = reqParam.getString(IPLIST_NAME);
-        Map<Map<String, String>, List<Map<String, String>>> ipMap = JedisUtil.getInstallNodeMap(ipListStr);
+        Map<RedisNode, List<RedisNode>> ipMap = JedisUtil.getInstallNodeMap(ipListStr);
         Set<String> ipSet = JedisUtil.getIPList( ipListStr );
         boolean res = false;
         // 安装节点
@@ -50,7 +51,7 @@ public abstract class PluginParent {
 
     protected abstract int addCluster(JSONObject reqParam);
 
-    protected void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap){
+    protected void buildRedisCluster(Map<RedisNode, List<RedisNode>> ipMap){
         redisManager.buildCluster( ipMap );
     }
 

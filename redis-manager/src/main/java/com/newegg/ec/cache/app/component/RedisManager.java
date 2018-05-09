@@ -5,6 +5,7 @@ import com.newegg.ec.cache.app.component.redis.JedisClusterClient;
 import com.newegg.ec.cache.app.component.redis.JedisMasterSlaveClient;
 import com.newegg.ec.cache.app.component.redis.RedisClientBase;
 import com.newegg.ec.cache.app.model.Host;
+import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.model.RedisQueryParam;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
@@ -76,7 +77,7 @@ public class RedisManager {
         return res;
     }
 
-    public boolean buildCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap){
+    public boolean buildCluster(Map<RedisNode, List<RedisNode>> ipMap){
         System.out.println( ipMap );
         logger.websocket("haha");
         return true;
