@@ -70,6 +70,7 @@ function ajax_pool_check()
  */
 function sparrow_error_handle( data )
 {
+	ajax_loading.hide();
 	console.log( data );
 }
 function bind( fn, obj ){
@@ -160,6 +161,7 @@ sparrow_ajax.prototype = {
           skin: 'layer-ext-moon',
           title: 'System error'
         });
+		ajax_loading.hide();
 	},
 	success_handle: function( data )
 	{

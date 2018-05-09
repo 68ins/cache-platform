@@ -28,8 +28,8 @@ public class ClusterDaoTest {
         Cluster cluster = new Cluster();
         cluster.setAddress("172.16.35.44:8379");
         cluster.setUserGroup("admin");
-        cluster.setClusterType("machine");
-        cluster.setClusterName("redis_2_8");
+        cluster.setClusterType("humpback");
+        cluster.setClusterName("redis_3");
         clusterDao.addCluster(cluster);
         nodeInfoTable.createTable("node_info_" + cluster.getId());
     }

@@ -28,9 +28,9 @@ public class CreateClusterLogHandler implements WebSocketHandler {
         JSONObject reqObject = JSONObject.fromObject(webSocketMessage.getPayload().toString());
         webSocketAndClustertable.put( reqObject.getString("id"), webSocketSession);
         while (true){
+            System.out.println( logMap.size() + " == "+ webSocketAndClustertable.size());
             BlockingDeque<String> logQueue = getLogQueue( webSocketSession );
             String message = logQueue.poll();
-            System.out.println( logQueue.size() + "-------" + message);
             if( !StringUtils.isEmpty( message )){
                 webSocketSession.sendMessage(new TextMessage("aaa " + message));
             }else{
@@ -82,15 +82,19 @@ public class CreateClusterLogHandler implements WebSocketHandler {
     }
 
     private  static synchronized void removeLogQueue(WebSocketSession webSocketSession){
-        BlockingDeque<String> blockingDeque = getLogQueue( webSocketSession );
-        blockingDeque = null;
-        logMap.remove( webSocketSession );
-        for(Map.Entry<String, WebSocketSession> entry : webSocketAndClustertable.entrySet()){
-            WebSocketSession socketSession = entry.getValue();
-            if( webSocketSession == socketSession ){
-                webSocketAndClustertable.remove( entry.getKey() );
-                break;
+        try {
+            BlockingDeque<String> blockingDeque = getLogQueue( webSocketSession );
+            blockingDeque = null;
+            logMap.remove( webSocketSession );
+            for(Map.Entry<String, WebSocketSession> entry : webSocketAndClustertable.entrySet()){
+                WebSocketSession socketSession = entry.getValue();
+                if( webSocketSession == socketSession ){
+                    webSocketAndClustertable.remove( entry.getKey() );
+                    break;
+                }
             }
+        }catch (Exception ignore){
+
         }
     }
 }

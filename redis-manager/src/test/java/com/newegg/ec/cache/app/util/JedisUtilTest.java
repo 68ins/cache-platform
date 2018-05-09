@@ -75,4 +75,10 @@ public class JedisUtilTest {
         System.out.println(JedisUtil.getInstallNodeList(ipListStr));
         System.out.println(JedisUtil.getInstallNodeList(ipListStr).size());
     }
+
+    @Test
+    public void testIplist3(){
+        String ipListStr = "127.0.0.1:8080";
+        System.out.println( JedisUtil.getInstallNodeMap(ipListStr) );
+    }
 }

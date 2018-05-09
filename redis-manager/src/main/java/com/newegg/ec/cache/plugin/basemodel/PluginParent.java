@@ -1,7 +1,6 @@
 package com.newegg.ec.cache.plugin.basemodel;
 
 import com.newegg.ec.cache.app.component.RedisManager;
-import com.newegg.ec.cache.app.dao.IClusterDao;
 import com.newegg.ec.cache.app.logic.ClusterLogic;
 import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.util.JedisUtil;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by gl49 on 2018/5/9.
@@ -30,13 +28,12 @@ public abstract class PluginParent {
     public boolean installTemplate(PluginParent pluginParent, JSONObject reqParam){
         String ipListStr = reqParam.getString(IPLIST_NAME);
         Map<RedisNode, List<RedisNode>> ipMap = JedisUtil.getInstallNodeMap(ipListStr);
-        Set<String> ipSet = JedisUtil.getIPList(ipListStr);
         List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
         boolean res = false;
         // 安装节点
         pluginParent.installNodeList(reqParam, nodelist);
         // 判断节点是否成功
-        boolean checkRes = pluginParent.checkInstallResult( ipSet );
+        boolean checkRes = pluginParent.checkInstallResult( nodelist );
         // 成功就更新 cluster address
         if( checkRes ){
             // 建立集群
@@ -44,7 +41,12 @@ public abstract class PluginParent {
             res = true;
         }
         if( res ){ // 如果安装成功
-            int clusterId = pluginParent.addCluster(reqParam);
+            int clusterId;
+            if( reqParam.containsKey("clusterId") ){  //如果有传 clusterId 那么证明是从扩容界面来的
+                clusterId = reqParam.getInt("clusterId");
+            }else{
+                clusterId = pluginParent.addCluster(reqParam);
+            }
             if(clusterId != -1){
                 pluginParent.addNodeList(reqParam, clusterId);
             }
@@ -63,10 +65,10 @@ public abstract class PluginParent {
         redisManager.buildCluster( ipMap );
     }
 
-    protected boolean checkInstallResult(Set<String> ipSet){
+    protected boolean checkInstallResult(List<RedisNode> ipList){
         boolean res = false;
-        for(String host : ipSet){
-            res = NetUtil.checkHost( host );
+        for(RedisNode redisNode : ipList){
+            res = NetUtil.checkIpAndPort( redisNode.getIp(), redisNode.getPort() );
             if( res ){
                 break;
             }

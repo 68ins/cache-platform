@@ -32,9 +32,10 @@
 
 .content-page {
     position: absolute;
-    top: 150px;
+    top: 70px;
     left: 0;
     right: 0;
+	padding:10px;
     bottom: 0;
     height: 100%;
     width: 100%;

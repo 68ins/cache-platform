@@ -1,5 +1,6 @@
 $(document).ready(function(){
-    var clusterId = getQueryString("clusterId");
+    window.clusterId = getQueryString("clusterId");
+    /*
     getCluster(clusterId, function(obj){
         var cluster = obj.res;
         console.log(cluster)
@@ -9,15 +10,21 @@ $(document).ready(function(){
             rebuildHumpbackNodeListTable( clusterId );
         });
     });
+     */
 });
 
-function rebuildHumpbackNodeListTable(clusterId){
-    smarty.get( "/node/getNodeList?pluginType=humpback&clusterId=" + clusterId , "plugin/humpback/humpback_mode_manager", "node-content", function(){
+function rebuildHumpbackNodeListTable(){
+    smarty.get( "/node/getNodeList?pluginType=humpback&clusterId=" + window.clusterId , "plugin/humpback/humpback_mode_manager", "node-list", function(){
         $("table").dataTable({});
         console.log("build table");
     }, true );
 }
 
-$("#add-node").click(function(){
-    init_install_ui();
+$("[href='#node-list']").click( function () {
+    rebuildHumpbackNodeListTable();
 });
+
+$("[href='#add-node']").click( function () {
+    $('iframe[name="node-install-manager"]').attr("src","/node/install?pluginType=humpback&clusterId=" + window.clusterId);
+});
+

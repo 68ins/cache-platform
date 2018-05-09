@@ -420,6 +420,10 @@ public class JedisUtil {
                         currentMaster = nodeItem;
                     }
                 }
+                if( StringUtils.isBlank( currentMaster.getIp() ) ){
+                    currentMaster = nodeItem;
+                    currentMaster.setRole( RedisNodeType.master );
+                }
                 if( resMap.get(currentMaster) == null ){
                     resMap.put(currentMaster, new ArrayList<>());
                 }

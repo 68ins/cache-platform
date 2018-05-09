@@ -241,3 +241,7 @@ a, a:hover{
 .null { color: magenta; }
 .key { color: red; }
 nav.sw-toolbar.sw-toolbar-bottom{ display:none; }
+
+textarea{
+    max-height: 200px;
+}
