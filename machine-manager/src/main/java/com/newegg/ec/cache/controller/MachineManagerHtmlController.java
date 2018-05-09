@@ -33,7 +33,7 @@ public class MachineManagerHtmlController {
     }
 
     @RequestMapping("/earlywarning")
-    public String earlyWarning(){
+    public String earlyWarning(Model model){
         return "earlywarning";
     }
 

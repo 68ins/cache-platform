@@ -69,6 +69,7 @@
                  "application/json",
                   function(data){
                       if(data.result!=null){
+                         document.title = data.result;
                          $("#appName").html(data.result);
                       }
                   },

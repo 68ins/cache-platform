@@ -26,7 +26,7 @@ public class MachineManagerServer {
     public FilterRegistrationBean someFilterRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(authenticationFilter());
-        registration.addUrlPatterns("/rest");
+        registration.addUrlPatterns("/rest/*");
         registration.addInitParameter("paramName", "paramValue");
         registration.setName("sessionFilter");
         return registration;
