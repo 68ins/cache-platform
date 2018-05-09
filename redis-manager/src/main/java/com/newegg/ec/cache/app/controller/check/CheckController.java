@@ -5,6 +5,7 @@ import com.newegg.ec.cache.app.model.Common;
 import com.newegg.ec.cache.app.model.Response;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.MathExpressionCalculateUtil;
+import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.userapi.UserAccess;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -47,7 +48,8 @@ public class CheckController {
 
     @RequestMapping(value = "/checkClusterName", method = RequestMethod.GET)
     @ResponseBody
-    public Response checkClusterName(@RequestParam String clusterId, @SessionAttribute(Common.SESSION_USER_KEY) User user){
+    public Response checkClusterName(@RequestParam String clusterId){
+        User user = RequestUtil.getUser();
         return logic.checkClusterNameByUserid( clusterId, user.getId());
     }
 
@@ -60,4 +62,20 @@ public class CheckController {
         return check ? Response.Success() : Response.Error("fail");
     }
 
+    @RequestMapping(value = "/checkBatchHumpbackContainerName", method = RequestMethod.POST)
+    @ResponseBody
+    public Response checkBatchHumpbackContainerName(@RequestBody String req){
+        JSONObject jsonObject = JSONObject.fromObject( req );
+        System.out.println( jsonObject  + "container");
+        return Response.Success();
+    }
+
+    @RequestMapping(value = "/checkBatchHostNotPass", method = RequestMethod.POST)
+    @ResponseBody
+    public Response checkBatchHostNotPass(@RequestBody String req){
+        JSONObject jsonObject = JSONObject.fromObject( req );
+        String ipList = jsonObject.getString("iplist");
+        System.out.println( ipList );
+        return logic.checkBatchHostNotPass( ipList );
+    }
 }
