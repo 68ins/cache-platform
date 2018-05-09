@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,6 +34,10 @@ public class CommonUtils {
     public static String getNowDate(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
         return sdf.format(new Date());
+    }
+
+    public static Timestamp getTimestamp(){
+        return new Timestamp(System.currentTimeMillis());
     }
 
     public static String getAddress(){

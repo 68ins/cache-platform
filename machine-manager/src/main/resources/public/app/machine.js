@@ -1,6 +1,7 @@
 var page = 1;
+var data = '{}';
 $(document).ready(function(){
-    getMachine({});
+    getMachine();
 
     $("#is_vm").change(function(){
         var is_vm = $("#is_vm option:selected").val().trim();
@@ -18,7 +19,7 @@ $(document).ready(function(){
     })
 
     // query enter event
-    $('#search').keyup(function(e){
+    $('#search').on("keyup",function(e){
         if(e.keyCode == 13){
             QueryMachineByIp();
         }
@@ -37,18 +38,29 @@ $(document).ready(function(){
 
 function checkIp(object){
     var value = object.val();
-    if(/[^\d\.]/g.test(value)){
-       layer.msg('Please enter a properly formatted IP');
-       object.val(value.substr(0, value.length - 1));
-    }
+        if(/[^\d\.]/g.test(value)){
+           layer.msg('Please enter a properly formatted IP');
+           object.val(value.substr(0, value.length - 1));
+        }
 }
 
-function getMachine( req ){
-    post("/rest/machine/getMachine", req, function(obj){
-        buildMachineTable(obj);
-    },function(e){
-        alert("Unknown error!");
-        console.log(e);
+function getMachine(){
+    layer.load(0,{shade:[0.75,'#fff'] });
+    $.ajax({
+       type: 'POST',
+       data:data,
+       url: "/rest/machine/getMachine",
+       dataType: "json",
+       contentType: "application/json",
+       success: function(resultJson){
+            var obj = eval(resultJson);
+            buildMachineTable(obj);
+            closeLayer();
+       },
+       error: function(e){
+           closeLayer();
+           alert("Unknown error!");
+       }
     });
 }
 
@@ -125,7 +137,7 @@ function buildMachineTable(machineList){
 
 function MachineInfo(ip){
     var machineNav = $("<li >" + ip + "</li>");
-    //parent.window.appendNavBar(machineNav);
+    parent.window.appendNavBar(machineNav);
     location.href = "machineinfo.html?ip=" + ip;
 }
 
@@ -148,70 +160,109 @@ function AddMachine(){
     $('#is_monitor').find("option[value='1']").attr("selected","selected");
 }
 
-$("#checkAddInfo").click(function(){
-    checkAddInfo();
-});
 function checkAddInfo(){
-    var machine_ip = getInputStr("machine_ip");
-    var usename = getInputStr("usename");
-    var passwd = getInputStr("passwd");
-    var location =  getInputStr("location");
-    var machine_name =  getInputStr("machine_name");
+    var machine_ip = $('#machine_ip').val().trim();
+    var usename = $('#usename').val().trim();
+    var passwd = $('#passwd').val().trim();
+    var location = $('#location').val().trim();
+    var machine_name = $('#machine_name').val().trim();
     if(machine_ip.length != 0  && usename.length != 0 && passwd.length != 0  && location.length != 0 && machine_name.length != 0){
-        var req = {};
-        req.ip = machine_ip;
-        req.usename = usename;
-        req.passwd = passwd;
-        post("/rest/machine/checkAddInfo", req, function( obj ){
-            if(obj.code == 0){
-                $('.right-img').attr('src','../../app/images/right.svg')
-                $('.right-span').css("display", 'block')
-                $('#right-show').show();
-                $('#cpu_coresize').val(obj.core);
-                $('#memory').val(obj.memory);
-                $('#savebtn').removeAttr('disabled');
-            } else if(obj.code == 1){
-                $('.right-img').attr('src', '../../app/images/wrong.svg')
-                $('.right-span').css("display", 'block')
-                return;
+       var json = '{"ip":"'+machine_ip
+                    +'","usename":"'+usename
+                    +'","passwd":"'+passwd+'"}';
+        $.ajax({
+            type: 'POST',
+            data:json,
+            url: "/rest/machine/checkAddInfo",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function(resultJson){
+                 var obj = eval(resultJson);
+                 if(obj.code == 0){
+                     $('.right-img').attr('src','../../app/images/right.svg')
+                     $('.right-span').css("display", 'block')
+                     $('#right-show').show();
+                     $('#cpu_coresize').val(obj.core);
+                     $('#memory').val(obj.memory);
+                     $('#savebtn').removeAttr('disabled');
+                     return true;
+                 } else {
+                     $('.right-img').attr('src', '../../app/images/wrong.svg');
+                     $('.right-span').css("display", 'block');
+                     $('#savebtn').attr('disabled', 'disabled');
+                     $('#savebtn').attr('operateType','0');
+                     return false;
+                 }
+                 closeLayer();
+            },
+            error: function(e){
+                layer.alert("Unknown error!");
+                return false;
+                closeLayer();
             }
-        }, function(e){
-            console.log(e);
         });
     } else {
+    return false;
          layer.alert("Incomplete information!");
     }
 
 }
 
-$("#saveMachine").click(function(){
-    saveMachine();
-});
-
 function saveMachine(){
-    var obj = getFormInput("machineModal");
-    obj.isVm = $('#is_vm option:selected').val().trim();
-    obj.is_monitor = $('#is_monitor option:selected').val().trim();
-    obj.operateType =  $('#saveMachine').attr('operateType');
-
-    obj.ip = obj.machine_ip;
-    obj.machineName = obj.machine_name;
-    obj.coreSize = obj.cpu_coresize;
-    obj.hostIp = obj.host_ip;
-    obj.isMonitor = obj.is_monitor;
-    if(obj.machine_ip != 0  && obj.location.length != 0 && obj.cpu_coresize.length != 0 && obj.memory.length != 0 && (obj.isVm == 0 || (obj.isVm == 1 && obj.host_ip.length != 0))){
-        post("/rest/machine/saveMachine", obj, function(obj){
-            if(obj.code == 0){
-                 layer.msg("success");
-                 setTimeout("location.reload()",2000);
-             } else if(obj.code == 1){
-                 layer.msg("exists");
-             } else if(obj.code == 2){
-                 layer.msg("error");
-             }
-        }, function(e){
-            layer.alert("Unknown error!");
-            console.log(e);
+    var machine_ip = $('#machine_ip').val().trim();
+    var machine_name = $('#machine_name').val().trim();
+    var location = $('#location').val().trim();
+    var usename = $('#usename').val().trim();
+    var passwd = $('#passwd').val().trim();
+    var cpu_coresize = $('#cpu_coresize').val().trim();
+    var memory = $('#memory').val().trim();
+    var is_vm = $('#is_vm option:selected').val().trim();
+    var host_ip = $('#host_ip').val().trim();
+    var is_monitor = $('#is_monitor option:selected').val().trim();
+    var remark = $('#remark').val().trim();
+    var operateType =  $('#savebtn').attr('operateType');
+    if(machine_ip != 0  && location.length != 0 && cpu_coresize.length != 0 && memory.length != 0 && (is_vm == 0 || (is_vm == 1 && host_ip.length != 0))){
+        var json = '{"ip":"'+ machine_ip +
+                     '", "machineName":"'+ machine_name +
+                     '", "location":"'+ location +
+                     '", "usename":"'+ usename +
+                     '", "passwd":"'+ passwd +
+                     '", "coreSize":"'+ cpu_coresize +
+                     '", "memory":"'+ memory +
+                     '", "isVm":"'+ is_vm +
+                     '", "hostIp":"'+ host_ip +
+                     '", "isMonitor":"'+ is_monitor +
+                     '", "remark":"'+ remark +
+                     '", "operateType":'+ operateType+ '}';
+        $.ajax({
+            type: 'POST',
+            data:json,
+            url: "/rest/machine/saveMachine",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function(resultJson){
+                 var obj = eval(resultJson);
+                 //buildMachineTable(obj);
+                 if(obj.code == 0){
+                     layer.msg("success");
+                     setTimeout("location.reload()",2000);
+                 } else if(obj.code == 1){
+                     layer.msg("exists");
+                 } else if(obj.code == 2){
+                     layer.msg("error");
+                 } else if(obj.code == 3){
+                     $('.right-img').attr('src', '../../app/images/wrong.svg');
+                     $('.right-span').css("display", 'block');
+                     $('#savebtn').attr('disabled', 'disabled');
+                     $('#savebtn').attr('operateType','0');
+                     return false;
+                 }
+                 closeLayer();
+            },
+            error: function(e){
+                layer.alert("Unknown error!");
+                closeLayer();
+            }
         });
     } else {
          layer.alert("Incomplete information!");
@@ -360,13 +411,13 @@ function pages(type){
         layer.msg('Is First Page !');
       }else{
         page = page - 1;
-        data.page = page;
-        getMachine( data );
+        data = '{"page":"'+page+'"}';
+        getMachine();
       }
    }else{
         //next
         page = page + 1;
-        data.page = page;
-        getMachine( data );
+        data = '{"page":"'+page+'"}';
+        getMachine();
    }
  }
