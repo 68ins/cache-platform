@@ -2,17 +2,18 @@ package com.newegg.ec.cache.plugin.humpback;
 
 import com.google.common.collect.Lists;
 import com.newegg.ec.cache.app.model.Cluster;
+import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.model.User;
-import com.newegg.ec.cache.app.util.HttpClientUtil;
-import com.newegg.ec.cache.app.util.JedisUtil;
-import com.newegg.ec.cache.app.util.RequestUtil;
+import com.newegg.ec.cache.app.util.*;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.Node;
 import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -50,6 +51,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
 
     }
 
+    /**
+     *  pull image
+     * @param pullParam
+     * @return
+     */
     @Override
     public boolean pullImage(JSONObject pullParam) {
 
@@ -75,11 +81,21 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return true;
     }
 
+    /**
+     * cluster install
+     * @param installParam
+     * @return
+     */
     @Override
     public boolean install(JSONObject installParam) {
         return installTemplate(this, installParam);
     }
 
+    /**
+     * node start
+     * @param startParam
+     * @return
+     */
     @Override
     public boolean start(JSONObject startParam) {
         String ip = startParam.getString("ip");
@@ -87,6 +103,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return optionContainer(ip, containerId, StartType.start);
     }
 
+    /**
+     * node stop
+     * @param stopParam
+     * @return
+     */
     @Override
     public boolean stop(JSONObject stopParam) {
         String ip = stopParam.getString("ip");
@@ -94,6 +115,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return optionContainer(ip, containerId, StartType.stop);
     }
 
+    /**
+     *  node restart
+     * @param restartParam
+     * @return
+     */
     @Override
     public boolean restart(JSONObject restartParam) {
         stop(restartParam);
@@ -101,6 +127,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return true;
     }
 
+    /**
+     * node remove
+     * @param removePram
+     * @return
+     */
     @Override
     public boolean remove(JSONObject removePram) {
         System.out.println(removePram);
@@ -119,6 +150,10 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return true;
     }
 
+    /**
+     * get image list from .yml
+     * @return
+     */
     @Override
     public List<String> getImageList() {
         User user  = RequestUtil.getUser();
@@ -126,6 +161,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return Lists.newArrayList(humpbackImage.split(","));
     }
 
+    /**
+     * show node list table in wesite
+     * @param clusterId
+     * @return
+     */
     @Override
     public List<Node> getNodeList(int clusterId) {
         List<Node> list = humpbackNodeDao.getHumbackNodeList(clusterId);
@@ -146,6 +186,91 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return String.format(humpbackApiFormat, ip);
     }
 
+    /**
+     * humpback 生成redis节点
+     * @param reqParam
+     * @param nodelist
+     */
+    @Override
+    protected void installNodeList(JSONObject reqParam, List<RedisNode> nodelist) {
+        String image = reqParam.getString("imageUrl");
+
+        List<Future<Boolean>> futureList = new ArrayList<>();
+        nodelist.forEach(node -> {
+            String ip = String.valueOf(node.getIp());
+            String port = String.valueOf(node.getPort());
+            String name = "redis" + port;
+            String command = ip + ":" + port;
+            JSONObject reqObject = generateInstallObjerct(image, name, command);
+            futureList.add(executorService.submit(new RedisInstallTask(ip, reqObject)));
+        });
+
+        for(Future<Boolean> future : futureList){
+            try {
+                future.get();
+            } catch (Exception e) {
+                logger.error("",e);
+            }
+        }
+        logger.websocket("redis cluster node install success");
+    }
+
+    /**
+     * 生成install node所需要的参数
+     * @param image
+     * @param name
+     * @param command
+     * @return
+     */
+    private JSONObject generateInstallObjerct(String image, String name, String command){
+
+        JSONObject reqObject =  new JSONObject();
+
+        reqObject.put("Image", image);
+        JSONArray volumes = new JSONArray();
+        JSONObject volumeObj = new JSONObject();
+        volumeObj.put("ContainerVolume", "/data/redis");
+        volumeObj.put("HostVolume", "/data/redis");
+        volumes.add(volumeObj);
+        reqObject.put("Volumes", volumes);
+        reqObject.put("NetworkMode", "host");
+        reqObject.put("RestartPolicy", "always");
+        reqObject.put("CPUShares", 0);
+        reqObject.put("Memory", 0);
+        reqObject.put("Name", name);
+        reqObject.put("Command", command);
+
+        return reqObject;
+    }
+
+    /**
+     * table cluster 写入数据
+     * @param reqParam
+     * @return 返回-1 写入数据失败
+     */
+    @Override
+    protected int addCluster(JSONObject reqParam) {
+        String ipListStr = reqParam.getString(IPLIST_NAME);
+        List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
+        RedisNode node = new RedisNode();
+        for(RedisNode redisNode : nodelist){
+            if(NetUtil.checkIpAndPort(redisNode.getIp(),redisNode.getPort())){
+                node = redisNode;
+                break;
+            }
+        }
+        if(StringUtils.isNotEmpty(node.getIp())){
+            Cluster cluster = new Cluster();
+            cluster.setAddress(node.getIp() + ":" + node.getPort());
+            cluster.setUserGroup(reqParam.get("group").toString());
+            cluster.setClusterType(reqParam.get("pluginType").toString());
+            cluster.setClusterName(reqParam.get("clusterName").toString());
+            if( clusterDao.addCluster(cluster) == 1){
+                return cluster.getId();
+            }
+        }
+        return -1;
+    }
 
     /**
      * table humpback_node 写入数据
@@ -154,28 +279,21 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      */
     @Override
     protected void addNodeList(JSONObject reqParam, int clusterId) {
-        System.out.println("add node list");
-    }
+        String ipListStr = reqParam.getString(IPLIST_NAME);
+        String image = reqParam.getString(IMAGE_URL);
+        List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
+        nodelist.forEach(node -> {
+            HumpbackNode humpbackNode = new HumpbackNode();
+            humpbackNode.setClusterId(clusterId);
+            humpbackNode.setContainerName("redis" + node.getPort());
+            humpbackNode.setUserGroup(reqParam.get("group").toString());
+            humpbackNode.setImage(image);
+            humpbackNode.setIp(node.getIp());
+            humpbackNode.setPort(node.getPort());
+            humpbackNode.setAddTime(DateUtil.getTime());
+            humpbackNodeDao.addHumbackNode(humpbackNode);
+        });
 
-
-    @Override
-    protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
-        System.out.println("install node list");
-    }
-
-    /**
-     * table cluster 写入数据
-     * @param reqParam
-     * @return
-     */
-    @Override
-    protected int addCluster(JSONObject reqParam) {
-        Cluster cluster = new Cluster();
-        if(1==0){
-            this.clusterDao.addCluster(cluster);
-        }
-        System.out.println("add cluster");
-        return 0;
     }
 
     /**
@@ -245,4 +363,20 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         }
     }
 
+    class RedisInstallTask implements Callable<Boolean> {
+
+        private String ip;
+        private JSONObject installObj ;
+        public RedisInstallTask(String ip, JSONObject installObj){
+            this.ip = ip;
+            this.installObj = installObj;
+        }
+        @Override
+        public Boolean call() throws Exception {
+            if(createContainer(ip,installObj) != null){
+                return true;
+            }
+            return false;
+        }
+    }
 }

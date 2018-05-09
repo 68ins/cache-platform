@@ -1,15 +1,16 @@
 package com.newegg.ec.cache.plugin.machine;
 
+import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
-import com.newegg.ec.cache.plugin.basemodel.*;
+import com.newegg.ec.cache.plugin.basemodel.Node;
+import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by lzz on 2018/4/20.
@@ -83,7 +84,7 @@ public class MachineManager extends PluginParent implements INodeOperate,INodeRe
     }
 
     @Override
-    protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
+    protected void installNodeList(JSONObject reqParam, List<RedisNode> nodelist) {
 
     }
 
