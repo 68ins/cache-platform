@@ -1,0 +1,52 @@
+<table id="humpbackNodeList" data-toggle="table" class="table table-hover table-bordered fixed-table-header"  >
+    <thead>
+    <tr >
+        <th  style="width:10px">#</th>
+        <th  class="display-hide">id</th>
+        <th  >Status</th>
+        <th  >InCluster</th>
+        <th  >Image Version</th>
+        <th  >Username</th>
+        <th  >Password</th>
+        <th  >Ip</th>
+        <th  >Port</th>
+        <th  >User Group</th>
+        <th  >Start Command</th>
+        <th  >Stop Command</th>
+        <th  >Install Path</th>
+        <th  >AddTime</th>
+        <th  style="width:170px">Operation</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{foreach from=$res item=machine }}
+         <tr>
+             <td  style="width:10px"> </td>
+             <td  class="display-hide">{{$machine.id}}</td>
+             <td>OK</td>
+             <td>YES</td>
+             <td>{{$machine.image}}</td>
+             <td>{{$machine.username}}</td>
+             <td>{{$machine.password}}</td>
+             <td>{{$machine.ip}}</td>
+             <td>{{$machine.port}}</td>
+             <td>{{$machine.userGroup}}</td>
+             <td>{{$machine.startCommand}}</td>
+             <td>{{$machine.stopCommand}}</td>
+             <td>{{$machine.installPath}}</td>
+             <td>{{$machine.addTime}}</td>
+             <td>
+                 <a href="/node/delete?pluginType=docker&containerName={{$machine.id}}" class="option-container">
+                     <button class="btn btn-danger btn-sm " type="button">Delete</button>&nbsp
+                 </a>
+                 <a href="/node/stop?pluginType=docker&containerName={{$machine.id}}" class="option-container">
+                     <button class="btn btn-primary btn-sm" type="button">Stop</button>&nbsp
+                 </a>
+                 <a href="/node/start?pluginType=docker&containerName={{$machine.id}}" class="option-container">
+                     <button class="btn btn-primary btn-sm" type="button">start</button>
+                 </a>
+             </td>
+         </tr>
+     {{/foreach}}
+    </tbody>
+</table>

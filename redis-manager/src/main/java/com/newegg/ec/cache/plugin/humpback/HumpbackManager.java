@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
 import com.newegg.ec.cache.app.util.HttpUtil;
+import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +39,8 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
     @Value("${cache.humpback.api.format}")
     private String humpbackApiFormat;
 
+    private static final String CONTAINER_OPTION_API = "containers";
+
     @Autowired
     IHumpbackNodeDao humpbackNodeDao;
 
@@ -46,10 +50,11 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
 
     @Override
     public boolean pullImage(JSONObject pullParam) {
-        List<String> ipList = pullParam.getJSONArray("ipList");
+        String ipStr = pullParam.getString("iplist");
+        Set<String> ipSet = JedisUtil.getIPList(ipStr);
         String imageUrl = pullParam.getString("imageUrl");
         List<Future<Boolean>> futureList = new ArrayList<>();
-        for(String ip : ipList){
+        for(String ip : ipSet){
             Future<Boolean> future = executorService.submit( new PullImageTask(ip, imageUrl) );
             futureList.add( future );
         }
@@ -170,7 +175,7 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
         object.put("Action",startType);
         object.put("Container",containerName);
         try {
-            String url = getApiAddress(ip)+"containers";
+            String url = getApiAddress(ip) + CONTAINER_OPTION_API;
             if(HttpClientUtil.getPutResponse(url, object)==null){
                 return false;
             }

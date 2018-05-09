@@ -11,6 +11,14 @@ $(document).ready(function(){
     });
 
 });
+
+$(document).on("click", "#start-install-cluster", function(obj){
+    var installParam = sparrow_form.encode( "create-cluster-form", 1 );
+    if ( !sparrow.empty( installParam )  ){
+        console.log( installParam );
+    }
+});
+
 function  createClusterStep( data ){
     smarty.html( "plugin/humpback/create_cluster_step", data, "create-cluster-container",function () {
         autosize(document.querySelectorAll('textarea'));

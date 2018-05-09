@@ -31,9 +31,113 @@ public class MachineNode extends Node{
     private String stopCommand;
     @MysqlField(field = "install_path", type = "varchar(200)", notNull = true)
     private String installPath;
+
     @MysqlField(field = "add_time", type = "int",  notNull = true)
     private int addTime;
 
+    public String getImage() {
+        return image;
+    }
 
+    public void setImage(String image) {
+        this.image = image;
+    }
 
+    public int getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(int clusterId) {
+        this.clusterId = clusterId;
+    }
+
+    public String getUserGroup() {
+        return userGroup;
+    }
+
+    public void setUserGroup(String userGroup) {
+        this.userGroup = userGroup;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getStartCommand() {
+        return startCommand;
+    }
+
+    public void setStartCommand(String startCommand) {
+        this.startCommand = startCommand;
+    }
+
+    public String getStopCommand() {
+        return stopCommand;
+    }
+
+    public void setStopCommand(String stopCommand) {
+        this.stopCommand = stopCommand;
+    }
+
+    public String getInstallPath() {
+        return installPath;
+    }
+
+    public void setInstallPath(String installPath) {
+        this.installPath = installPath;
+    }
+
+    public int getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(int addTime) {
+        this.addTime = addTime;
+    }
+
+    @Override
+    public String toString() {
+        return "MachineNode{" +
+                "id=" + id +
+                ", image='" + image + '\'' +
+                ", clusterId=" + clusterId +
+                ", userGroup='" + userGroup + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", ip='" + ip + '\'' +
+                ", port=" + port +
+                ", startCommand='" + startCommand + '\'' +
+                ", stopCommand='" + stopCommand + '\'' +
+                ", installPath='" + installPath + '\'' +
+                ", addTime=" + addTime +
+                '}';
+    }
 }

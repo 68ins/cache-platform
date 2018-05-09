@@ -1,5 +1,6 @@
 package com.newegg.ec.cache.app.util;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.util.Slowlog;
@@ -358,15 +359,55 @@ public class JedisUtil {
         return list;
     }
 
-    public static List<String> getClusterAllNode(String ipport) {
-        String[] addr = ipport.split(":");
-        List<Map<String, String>> list =  nodeList(addr[0], Integer.parseInt(addr[1]));
-        List<String> result = new ArrayList(list.size());
-        for (Map<String, String> map : list) {
-            result.add(map.get("ip")+":"+map.get("port"));
+    public static Set<String> getIPList(String nodeStr){
+        Set<String> ipSet = new HashSet<>();
+        String[] nodeArr = nodeStr.split("\n");
+        for(String node : nodeArr){
+            try {
+                String[] tmpArr = node.split("\\s+");
+                String host = tmpArr[0];
+                String ip = host.split(":")[0];
+                ipSet.add( ip );
+            }catch (Exception ignore){
+
+            }
         }
-        return result;
+        return ipSet;
     }
+    public static Map<Map<String, String>, List<Map<String, String>>> getInstallNodeMap(String nodeStr){
+        Map<Map<String, String>, List<Map<String, String>>> resMap = new HashedMap();
+        Map<String, String> currentMaster = new HashedMap();
+        String[] nodeArr = nodeStr.split("\n");
+        for(String node : nodeArr){
+            try {
+                Map<String, String> nodeItem = new HashedMap();
+                String[] tmpArr = node.split("\\s+");
+                if( tmpArr.length >= 1 ){
+                    nodeItem.put("host", tmpArr[0]);
+                    nodeItem.put("role", "slave");
+                }
+                if( tmpArr.length > 2 ){
+                    if( tmpArr[1].equals("master") ){
+                        nodeItem.put("role", "master");
+                        nodeItem.put("username", tmpArr[2]);
+                        nodeItem.put("password", tmpArr[3]);
+                        currentMaster = nodeItem;
+                    }else{
+                        nodeItem.put("username", tmpArr[1]);
+                        nodeItem.put("password", tmpArr[2]);
+                    }
+                }
+                if( resMap.get(currentMaster) == null ){
+                    resMap.put(currentMaster, new ArrayList<>());
+                }
+                List<Map<String, String>> slaveList = resMap.get(currentMaster);
+                if( nodeItem.get("role").equals("slave") ){
+                    slaveList.add(nodeItem);
+                }
+            }catch (Exception ignore){
 
-
+            }
+        }
+        return resMap;
+    }
 }

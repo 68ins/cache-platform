@@ -151,10 +151,4 @@ public class ClusterController {
         return Response.Result(0, detailNodeList);
     }
 
-    @RequestMapping("/checkVersion")
-    @ResponseBody
-    public Response checkRedisVersion(@RequestParam String address){
-        int version = logic.checkRedisVersion(address);
-        return Response.Result(0, version);
-    }
 }
