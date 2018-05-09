@@ -28,6 +28,11 @@ public class MonitorController {
         return "monitor";
     }
 
+    @RequestMapping(value = "/clusterMonitor")
+    public String clusterMonitor(Model model){
+        return "monitor2";
+    }
+
     @RequestMapping("/clusterMonitorList")
     public String accessMonitorList(){
         return "clusterMonitorList";

@@ -23,8 +23,8 @@
          <tr>
              <td  style="width:10px"> </td>
              <td  class="display-hide">{{$machine.id}}</td>
-             <td>OK</td>
-             <td>YES</td>
+             <td id="status-{{$machine.id}}">{{service_status  ip=$machine.ip port=$machine.port id=$machine.id}}</td>
+             <td id="in-cluster-{{$machine.id}}">{{in_cluster ip=$machine.ip port=$machine.port id=$machine.id}}</td>
              <td>{{$machine.image}}</td>
              <td>{{$machine.username}}</td>
              <td>{{$machine.password}}</td>

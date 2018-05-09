@@ -1,5 +1,6 @@
 package com.newegg.ec.cache.app.component;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
 import com.newegg.ec.cache.app.component.redis.IRedis;
 import com.newegg.ec.cache.app.component.redis.JedisClusterClient;
 import com.newegg.ec.cache.app.component.redis.JedisMasterSlaveClient;
@@ -94,6 +95,31 @@ public class RedisManager {
         return res;
     }
 
+    public boolean beMaster(String ip, int port, String masterId) {
+        boolean res = false;
+        Jedis jedis = new Jedis(ip, port);
+        try {
+            jedis.clusterFailover();
+            res = true;
+        } catch (Exception e){
+            jedis.close();
+        }
+        return res;
+    }
+
+    public boolean forget(String ip, int port, String masterId) {
+        boolean res = false;
+        Jedis jedis = new Jedis(ip, port);
+        try {
+            String s = jedis.clusterForget(masterId);
+            System.out.println(s);
+            res = true;
+        } catch (Exception e){
+            jedis.close();
+        }
+        return res;
+    }
+
     public boolean clusterMeet(String slaveIp, int slavePort, String masterIp, int masterPort){
         boolean res = false;
         Jedis jedis = new Jedis( slaveIp, slavePort );
@@ -168,4 +194,6 @@ public class RedisManager {
         buildClusterBeSlave( ipMap );
         return true;
     }
+
+
 }

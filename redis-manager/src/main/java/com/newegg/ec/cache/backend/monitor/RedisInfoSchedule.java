@@ -37,7 +37,7 @@ public class RedisInfoSchedule{
     @Resource
     private INodeInfoDao infoDao;
 
-    @Scheduled(fixedRate = 1000 * 120)
+    @Scheduled(fixedRate = 1000 * 20)
     public void reportCurrentTime() {
         List<Cluster>  clusterList = clusterDao.getClusterList(null);
         for (Cluster cluster: clusterList) {
