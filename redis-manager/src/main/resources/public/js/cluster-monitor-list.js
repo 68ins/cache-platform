@@ -42,9 +42,15 @@ $(document).on("click", ".cluster-info-detail", function(res){
     var clusterId = $(this).data("cluster-id");
     var address = $(this).data("cluster-address");
     smarty.get( "/cluster/getClusterInfoByAddress?address=" + address, "monitor/cluster_info", "cluster-info-" + clusterId, function(obj){
-       countWarningLogByClusterId(clusterId, function(obj){
-            $("#cluster-alarm-" + clusterId).text( obj.res );
-       });
+        countWarningLogByClusterId(clusterId, function(obj){
+            var alarmNumber = parseInt(obj.res);
+            console.log(alarmNumber)
+            if(alarmNumber > 0){
+                $("#cluster-alarm-" + clusterId).text(alarmNumber);
+            } else {
+                $("#cluster-alarm-" + clusterId).remove();
+            }
+        });
     }, true );
 });
 

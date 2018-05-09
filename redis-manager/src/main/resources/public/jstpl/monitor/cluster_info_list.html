@@ -11,16 +11,19 @@
 
                     </a>
                 </div>
-                <div class="detail">
+                <div class="option-wrapper">
                     <a href="/monitor/manager?clusterId={{$cluster.id}}" class="option-container">
                         <button class="btn btn-primary btn-sm" type="button">Detail</button>
                     </a>
                     <a href="/alarm/alarmSystem?clusterId={{$cluster.id}}" class="option-container">
-                        <button class="btn btn-danger btn-sm" type="button">Alarm</button>
+                        <button class="btn btn-warning btn-sm" type="button">Alarm</button>
                     </a>
                     <a href="/alarm/alarmSystem?clusterId={{$cluster.id}}" id="cluster-alarm-{{$cluster.id}}" class="alarm" target="_blank" title="cluster alarm">
-
                     </a>
+                    <!--<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <i class="icon-tasks"></i>
+                        <span class="badge bg-success">6</span>
+                    </a>-->
                  </div>
             </div>
         </li>

@@ -176,16 +176,33 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.detail {
+.option-wrapper {
 	padding-top: 4%;
     display: flex;
     justify-content: center;
 }
 
-.detail button {
+.option-wrapper button {
 	width: 60px;
+}
+
+.option-wrapper a, .option-wrapper a:hover {
+    color: #FFFFFF;
+    text-decoration: none;
 }
 
 .option-container {
     margin: 0px 10px;
+}
+
+.alarm {
+    position: relative;
+    top: -8px;
+    left: -20px;
+    height: 18px;
+    width: 18px;
+    border-radius: 18px;
+    text-align: center;
+    line-height: 18px;
+    background-color: #FF5722;
 }

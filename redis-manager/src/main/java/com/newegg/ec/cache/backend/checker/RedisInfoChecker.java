@@ -169,7 +169,6 @@ public class RedisInfoChecker {
                 checkLogDao.addClusterCheckLog(log);
             }
         }
-
     }
 
     /**
