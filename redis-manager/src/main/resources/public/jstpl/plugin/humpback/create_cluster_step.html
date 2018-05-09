@@ -4,7 +4,7 @@
         <tr class="input-format">
             <td class="container-table-tag">Cluster Name</td>
             <td>
-                <input name="clusterId" type="text" class="form-control" data-ajax-type="get"  placeholder="cluster-name"  data-require="1" data-len="3-20" data-len-msg="length range5-20" data-format="[a-zA-Z0-9_]+" data-format-msg="only support letter and number or _"  data-server-check="/logcheck/checkClusterName"  >
+                <input name="clusterId" type="text" class="form-control" data-ajax-type="get"  placeholder="cluster-name"  data-require="1" data-len="3-20" data-len-msg="length range5-20" data-format="[a-zA-Z0-9_]+" data-format-msg="only support letter and number or _"  data-server-check="/check/checkClusterName"  >
                 <div id="clusterId_tip"></div>
             </td>
         </tr>
@@ -44,7 +44,7 @@
             <td class="container-table-tag" >Batch IP List </td>
             <td colspan="3">
                 <div class="node-value text-value ip-list-value">
-                    <textarea class="host-list form-control" rows="6" name="iplist"  data-require="1" data-server-check="/logcheck/batchHostNotPass,/logcheck/batchHumpbackContainerName"  placeholder="example 127.0.0.1:8008" ></textarea>
+                    <textarea class="host-list form-control" rows="6" name="iplist"  data-require="1" data-server-check="/check/checkBatchHostNotPass,/check/checkBatchHumpbackContainerName"  placeholder="example 127.0.0.1:8008" ></textarea>
                     <div id="iplist_tip"></div>
                 </div>
             </td>

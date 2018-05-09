@@ -1,5 +1,7 @@
 package com.newegg.ec.cache.core.logger;
 
+import com.newegg.ec.cache.app.controller.websocket.CreateClusterLogHandler;
+import com.newegg.ec.cache.app.util.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,5 +19,10 @@ public class CommonLogger {
 
     public void error(String msg, Throwable e){
         this.logger.error( msg, e );
+    }
+
+    public String websocket(String msg){
+        CreateClusterLogHandler.appendLog(String.valueOf( RequestUtil.getUser().getId() ), msg);
+        return msg;
     }
 }

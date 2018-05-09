@@ -97,7 +97,7 @@ public class RedisInfoChecker {
             String host = cluster.getAddress().split(",")[0];
             String ip = host.split(":")[0];
             int port = Integer.parseInt(host.split(":")[1]);
-            List<ClusterCheckRule> ruleList = checkRuleDao.getClusterRuleList(clusterName);
+            List<ClusterCheckRule> ruleList = checkRuleDao.getClusterRuleList(cluster_id+"");
 
             //获取每个cluster所有的node
             List<Map<String, String>> nodeList = JedisUtil.nodeList(ip, port);
