@@ -1,12 +1,19 @@
 $(document).ready(function(){
-  rebuildHumpbackNodeListTable();
+    var clusterId = getQueryString("clusterId");
+    getCluster(clusterId, function(obj){
+        var cluster = obj.res;
+        console.log(cluster)
+        nodeList(cluster.address, function(obj){
+            window.nodeList = obj.res;
+            console.log(nodeList)
+            rebuildHumpbackNodeListTable( clusterId );
+        });
+    });
 });
 
-function rebuildHumpbackNodeListTable(){
-    //var clusterId = window.clusterId;
-    var clusterId = 1;
+function rebuildHumpbackNodeListTable(clusterId){
     smarty.get( "/node/getNodeList?pluginType=humpback&clusterId=" + clusterId , "plugin/humpback/humpback_mode_manager", "node-content", function(){
         $("table").dataTable({});
+        console.log("build table");
     }, true );
-
 }

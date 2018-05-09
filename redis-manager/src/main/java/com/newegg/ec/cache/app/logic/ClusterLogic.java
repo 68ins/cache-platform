@@ -164,4 +164,12 @@ public class ClusterLogic {
     public boolean beSlave(String ip, int port, String masterId) {
         return redisManager.beSlave(ip, port, masterId);
     }
+
+    public boolean beMaster(String ip, int port, String masterId) {
+        return redisManager.beMaster(ip, port, masterId);
+    }
+
+    public boolean forgetNode(String ip, int port, String masterId) {
+        return redisManager.forget(ip, port, masterId);
+    }
 }

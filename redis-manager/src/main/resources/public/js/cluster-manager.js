@@ -19,7 +19,7 @@ $(document).ready(function(){
 });
 
 $('[href="#nodeManager"]').click(function () {
-    $('iframe[name="node-manager"]').attr("src","/node/manager?pluginType=" + window.pluginType);
+    $('iframe[name="node-manager"]').attr("src","/node/manager?pluginType=" + window.pluginType  + "&clusterId=" + window.clusterId);
 });
 
 $('[href="#clusterManager"]').click(function () {

@@ -49,7 +49,6 @@ public class NodeController {
         return template;
     }
 
-
     @RequestMapping(value = "/getImageList", method = RequestMethod.GET)
     @ResponseBody
     public Response getImageList(@RequestParam PluginType pluginType){

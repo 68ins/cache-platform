@@ -19,14 +19,14 @@
          <tr>
              <td  style="width:10px"> </td>
              <td  class="display-hide">{{$humpback.id}}</td>
-             <td>OK</td>
-             <td>YES</td>
+             <td id="status-{{$humpback.id}}">{{service_status  ip=$humpback.ip port=$humpback.port id=$humpback.id}}</td>
+             <td id="in-cluster-{{$humpback.id}}">{{in_cluster ip=$humpback.ip port=$humpback.port id=$humpback.id}}</td>
              <td>{{$humpback.containerName}}</td>
              <td>{{$humpback.image}}</td>
              <td>{{$humpback.ip}}</td>
              <td>{{$humpback.port}}</td>
              <td>{{$humpback.userGroup}}</td>
-             <td>{{$humpback.addTime}}</td>
+             <td>{{format_time time=$humpback.addTime}}</td>
              <td>
                  <a href="/node/delete?pluginType=humpback&containerName={{$humpback.containerName}}" class="option-container">
                      <button class="btn btn-danger btn-sm " type="button">Delete</button>&nbsp
