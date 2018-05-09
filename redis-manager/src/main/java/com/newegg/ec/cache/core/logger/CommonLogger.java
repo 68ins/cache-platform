@@ -1,6 +1,7 @@
 package com.newegg.ec.cache.core.logger;
 
 import com.newegg.ec.cache.app.controller.websocket.CreateClusterLogHandler;
+import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,10 @@ public class CommonLogger {
     }
 
     public String websocket(String msg){
+        User user = RequestUtil.getUser();
+        if( null == user ){
+            return msg;
+        }
         CreateClusterLogHandler.appendLog(String.valueOf( RequestUtil.getUser().getId() ), msg);
         return msg;
     }

@@ -95,7 +95,7 @@ public class ClusterController {
     @RequestMapping(value = "/addCluster", method = RequestMethod.POST)
     @ResponseBody
     public Response addCluster(@RequestBody Cluster cluster){
-        boolean res = logic.addCluster( cluster );
+        int res = logic.addCluster( cluster );
         return Response.Result(0, res);
     }
 

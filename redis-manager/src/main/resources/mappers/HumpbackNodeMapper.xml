@@ -22,7 +22,7 @@
     </delete>
 
     <insert id="addHumbackNode"  parameterType="com.newegg.ec.cache.plugin.humpback.HumpbackNode"  useGeneratedKeys="true" keyProperty="id">
-        insert into humpback_node(image,container_name,cluster_id, user_group, ip,port, add_time ) values(#{image},#{containerName},#{clusterId},#{group},#{ip},#{port},#{addTime})
+        insert into humpback_node(image,container_name,cluster_id, user_group, ip,port, add_time ) values(#{image},#{containerName},#{clusterId},#{userGroup},#{ip},#{port},#{addTime})
     </insert>
 
 </mapper>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.springframework.org/schema/mvc">
 <head>
     <meta charset="UTF-8" />
     <title>Humpback Node</title>
@@ -22,9 +22,10 @@
     <link rel="stylesheet" href="../css/node.css"/>
 </head>
 <body>
-<div class="body-container node-body">
+<div class="body-container container-color">
+    <button class="btn btn-default" id="add-node">Add Node</button>
     <div class="main-swapper">
-        <div class="tab-content node-manager-tab" >
+        <div class="tab-content" >
             <div class="tab-pane fade in active" id="node-content">
             </div>
         </div>
@@ -32,5 +33,6 @@
 </div>
 
 </body>
+
 <script src="../js/plugin/humpback-node-manager.js"></script>
 </html>

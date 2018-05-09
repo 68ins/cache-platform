@@ -8,5 +8,8 @@ function rebuildHumpbackNodeListTable(){
     smarty.get( "/node/getNodeList?pluginType=humpback&clusterId=" + clusterId , "plugin/humpback/humpback_mode_manager", "node-content", function(){
         $("table").dataTable({});
     }, true );
-
 }
+
+$("#add-node").click(function(){
+    init_install_ui();
+});
