@@ -7,14 +7,17 @@ import com.newegg.ec.cache.app.model.Response;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
+import com.newegg.ec.cache.app.util.RemoteShellUtil;
 import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by gl49 on 2018/4/22.
@@ -94,5 +97,69 @@ public class CheckLogic {
         }else{
             return Response.Success();
         }
+    }
+
+    public  Response checkBatchDirPermission(JSONObject req){
+        String iplist = req.getString("iplist");
+        Set<String> ipSet = JedisUtil.getIPList( iplist );
+        String errorMsg = "";
+        for(String ip : ipSet){
+            String username = req.getString("username");
+            String password = req.getString("password");
+            String installPath = req.getString("installPath");
+            String cmd = getCheckDirPermission( installPath );
+            RemoteShellUtil remoteShellUtil = new RemoteShellUtil(ip, username, password);
+            errorMsg += remoteShellUtil.exec(cmd);
+        }
+        if( !StringUtils.isBlank( errorMsg ) ){
+            return Response.Error( errorMsg );
+        }
+        return  Response.Success();
+    }
+
+    public  Response checkBatchWgetPermission(JSONObject req){
+        String iplist = req.getString("iplist");
+        Set<String> ipSet = JedisUtil.getIPList( iplist );
+        String errorMsg = "";
+        for(String ip : ipSet){
+            String username = req.getString("username");
+            String password = req.getString("password");
+            String cmd = getCheckCommand("wget");
+            RemoteShellUtil remoteShellUtil = new RemoteShellUtil(ip, username, password);
+            errorMsg += remoteShellUtil.exec(cmd);
+        }
+        if( !StringUtils.isBlank( errorMsg ) ){
+            return Response.Error( errorMsg );
+        }
+        return  Response.Success();
+    }
+
+    public  Response checkBatchUserPermisson(JSONObject req){
+        String iplist = req.getString("iplist");
+        Set<String> ipSet = JedisUtil.getIPList( iplist );
+        String errorMsg = "";
+        for(String ip : ipSet){
+            String username = req.getString("username");
+            String password = req.getString("password");
+            boolean res = NetUtil.checkIpAnduserAccess(ip, username, password);
+            if( !res ){
+                errorMsg += username + " user is not permisson <br/>";
+            }
+        }
+        if( !StringUtils.isBlank( errorMsg ) ){
+            return Response.Error( errorMsg );
+        }
+        return  Response.Success();
+    }
+
+    public String getCheckDirPermission(String installPath){
+        return "if [ ! -w '" + installPath + "' ];then echo '"+ installPath +" without permision <br>'; fi";
+    }
+    public String getCheckDirExist(String installPath){
+        return  "if [ ! -d '" + installPath + "' ]; then echo 'without the " + installPath + " dir <br>'; fi";
+    }
+
+    public String getCheckCommand(String command){
+        return "if [ ! `command -v " + command +"` ]; then echo 'no exists " + command + "<br>'; fi";
     }
 }
