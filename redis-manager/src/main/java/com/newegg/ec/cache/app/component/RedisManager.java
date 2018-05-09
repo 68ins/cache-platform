@@ -5,9 +5,11 @@ import com.newegg.ec.cache.app.component.redis.JedisClusterClient;
 import com.newegg.ec.cache.app.component.redis.JedisMasterSlaveClient;
 import com.newegg.ec.cache.app.component.redis.RedisClientBase;
 import com.newegg.ec.cache.app.model.Host;
+import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.model.RedisQueryParam;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
+import com.newegg.ec.cache.core.logger.CommonLogger;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.Map;
  */
 @Component
 public class RedisManager {
+    public static CommonLogger logger = new CommonLogger(RedisManager.class);
+
     public IRedis factory(String address){
         IRedis redis;
         Host host = NetUtil.getHostPassAddress( address );
@@ -73,5 +77,9 @@ public class RedisManager {
         return res;
     }
 
-
+    public boolean buildCluster(Map<RedisNode, List<RedisNode>> ipMap){
+        System.out.println( ipMap );
+        logger.websocket("haha");
+        return true;
+    }
 }

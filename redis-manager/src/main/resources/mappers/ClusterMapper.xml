@@ -20,4 +20,12 @@
     <insert id="addCluster"  parameterType="com.newegg.ec.cache.app.model.Cluster"  useGeneratedKeys="true" keyProperty="id">
         insert into cluster(address,cluster_name,user_group, ssl_username, ssl_password,cluster_type ) values(#{address},#{clusterName},#{userGroup},#{sslUsername},#{sslPassword},#{clusterType})
     </insert>
+    <update id="updateClusterAddress">
+        UPDATE
+        cluster
+        SET
+        address = #{address}
+        WHERE
+        id = #{id}
+    </update>
 </mapper>
