@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/check")
-@UserAccess(autoCreate = false)
+@UserAccess(autoCreate = true)
 public class CheckController {
     @Resource
     private CheckLogic logic;
@@ -85,5 +85,26 @@ public class CheckController {
         String ipList = jsonObject.getString("iplist");
         System.out.println( ipList );
         return logic.checkBatchHostNotPass( ipList );
+    }
+
+    @RequestMapping(value = "/checkBatchDirPermission", method = RequestMethod.POST)
+    @ResponseBody
+    public Response checkBatchDirPermission(@RequestBody String req){
+        JSONObject jsonObject = JSONObject.fromObject( req );
+        return logic.checkBatchDirPermission( jsonObject );
+    }
+
+    @RequestMapping(value = "/checkBatchWgetPermission", method = RequestMethod.POST)
+    @ResponseBody
+    public Response checkBatchWgetPermission(@RequestBody String req){
+        JSONObject jsonObject = JSONObject.fromObject( req );
+        return logic.checkBatchWgetPermission( jsonObject );
+    }
+
+    @RequestMapping(value = "/checkBatchUserPermisson", method = RequestMethod.POST)
+    @ResponseBody
+    public Response checkBatchUserPermisson(@RequestBody String req){
+        JSONObject jsonObject = JSONObject.fromObject( req );
+        return logic.checkBatchUserPermisson( jsonObject );
     }
 }

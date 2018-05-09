@@ -5,17 +5,19 @@ import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.*;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by lzz on 2018/4/20.
  */
 @Component
-public class MachineManager implements INodeOperate,INodeRequest {
-
-    private int userId;
+public class MachineManager extends PluginParent implements INodeOperate,INodeRequest {
+    @Value("${cache.machine.image}")
+    private String machineImage;
 
     @Autowired
     IMachineNodeDao  machineNodeDao;
@@ -23,10 +25,6 @@ public class MachineManager implements INodeOperate,INodeRequest {
     public MachineManager(){
         //ignore
     }
-    public MachineManager(int userId){
-        this.userId = userId;
-    }
-
 
     @Override
     public boolean pullImage(JSONObject pullParam) {
@@ -77,5 +75,20 @@ public class MachineManager implements INodeOperate,INodeRequest {
     @Override
     public String showManager() {
         return "plugin/machine/machineNodeManager";
+    }
+
+    @Override
+    protected void addNodeList(JSONObject reqParam, int clusterId) {
+
+    }
+
+    @Override
+    protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
+
+    }
+
+    @Override
+    protected int addCluster(JSONObject reqParam) {
+        return 0;
     }
 }

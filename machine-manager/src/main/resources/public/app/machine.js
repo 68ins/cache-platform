@@ -138,7 +138,7 @@ function buildMachineTable(machineList){
 function MachineInfo(ip){
     var machineNav = $("<li >" + ip + "</li>");
     parent.window.appendNavBar(machineNav);
-    location.href = "machineinfo.html?ip=" + ip;
+    location.href = "machineinfo?ip=" + ip;
 }
 
 function AddMachine(){
@@ -368,7 +368,7 @@ function QueryMachineByIp(){
 function earlyWarning(ip){
     var machineNav = $("<li >" + ip + "</li>");
     parent.window.appendNavBar(machineNav);
-    location.href = "earlywarning.html?ip=" + ip;
+    location.href = "earlywarning?ip=" + ip;
 }
 
 function DelMachine(ip){
