@@ -3,7 +3,6 @@ smarty.get( "/cluster/listCluster?group=admin", "cluster/cluster_list_content", 
 }, true );
 
 smarty.register_function( 'cluster_state', function( params ){
-    console.log(params)
     var address = params['address'];
     var id = params["id"];
     var div_id = "cluster-state-" +  id;
@@ -24,7 +23,7 @@ $(document).on("click", "#add-cluster", function(){
     });
 });
 $(document).on("click", "#save-cluster", function(){
-    var cluster = sparrow_form.encode( "add-cluster-form",0 );
+    var cluster = sparrow_form.encode("add-cluster-form", 0);
     if ( sparrow.empty( cluster ) ){
         return false;
     }

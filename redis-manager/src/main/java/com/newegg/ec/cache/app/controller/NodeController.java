@@ -43,12 +43,12 @@ public class NodeController {
     }
 
     @RequestMapping("/manager")
-    public String manager(Model model, @RequestParam PluginType pluginType) {
+    public String manager(Model model, @RequestParam PluginType pluginType, @SessionAttribute(Common.SESSION_USER_KEY) User user) {
         nodeRequest = nodeManager.factoryRequest(pluginType);
         String template = nodeRequest.showManager();
+        model.addAttribute("user", user);
         return template;
     }
-
 
     @RequestMapping(value = "/getImageList", method = RequestMethod.GET)
     @ResponseBody
@@ -112,6 +112,9 @@ public class NodeController {
     public Response nodePullImage(@RequestBody NodeRequestPram nodeRequestPram){
         nodeOperate = nodeManager.factoryOperate( nodeRequestPram.getPluginType() );
         boolean res = nodeOperate.pullImage( nodeRequestPram.getReq() );
-        return Response.Result(Response.DEFAULT, res);
+        if( res ){
+            return Response.Result(Response.DEFAULT, res);
+        }
+        return Response.Warn("pull image is fail");
     }
 }

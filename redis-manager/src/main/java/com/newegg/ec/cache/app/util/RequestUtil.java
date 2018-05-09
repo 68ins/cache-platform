@@ -19,9 +19,14 @@ public class RequestUtil {
     }
 
     public static HttpServletRequest getRequest(){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        if( null != request ){
-            request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = null;
+        try {
+            request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            if( null != request ){
+                request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            }
+        }catch (Exception ignore){
+            //ignore
         }
         return request;
     }
@@ -32,11 +37,16 @@ public class RequestUtil {
      */
     public static void setObject(String name, Object object) {
         HttpServletRequest request = getRequest();
-        request.setAttribute(name, object);
+        if( null != request ){
+            request.setAttribute(name, object);
+        }
     }
 
     public static Object getObject(String name){
         HttpServletRequest request = getRequest();
+        if( null == request ){
+            return null;
+        }
         Object object = request.getAttribute(name);
         return object;
     }

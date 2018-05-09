@@ -81,8 +81,8 @@ public class ClusterLogic {
         return clusterListInfo;
     }
 
-    public boolean addCluster(Cluster cluster){
-        boolean res = false;
+    public int addCluster(Cluster cluster){
+        int res = -1;
         try {
             int row = clusterDao.addCluster(cluster);
             if (row > 0){
@@ -90,9 +90,7 @@ public class ClusterLogic {
                 cluster.setUserGroup(cluster.getUserGroup());
                 cluster.setClusterName(cluster.getClusterName());
                 nodeInfoTable.createTable(Common.NODE_INFO_TABLE_FORMAT + cluster.getId());
-                res = true;
-            } else {
-                return false;
+                res = cluster.getId();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -163,5 +161,13 @@ public class ClusterLogic {
 
     public boolean beSlave(String ip, int port, String masterId) {
         return redisManager.beSlave(ip, port, masterId);
+    }
+
+    public boolean beMaster(String ip, int port, String masterId) {
+        return redisManager.beMaster(ip, port, masterId);
+    }
+
+    public boolean forgetNode(String ip, int port, String masterId) {
+        return redisManager.forget(ip, port, masterId);
     }
 }

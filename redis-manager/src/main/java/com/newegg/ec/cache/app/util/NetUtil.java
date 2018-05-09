@@ -89,8 +89,12 @@ public class NetUtil {
 
     public static boolean checkHost(String address){
         String[] tmpArr = address.split(":");
-        return checkIpAndPort( tmpArr[0], Integer.valueOf(tmpArr[1]));
+        if( tmpArr.length == 2 ){
+            return checkIpAndPort( tmpArr[0], Integer.valueOf(tmpArr[1]));
+        }
+        return true;
     }
+
     public static boolean checkIpAndPort(String ip, Integer port){
         boolean res = false;
         Socket socket = new Socket();

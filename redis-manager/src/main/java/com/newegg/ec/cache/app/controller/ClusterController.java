@@ -95,7 +95,7 @@ public class ClusterController {
     @RequestMapping(value = "/addCluster", method = RequestMethod.POST)
     @ResponseBody
     public Response addCluster(@RequestBody Cluster cluster){
-        boolean res = logic.addCluster( cluster );
+        int res = logic.addCluster( cluster );
         return Response.Result(0, res);
     }
 
@@ -143,7 +143,6 @@ public class ClusterController {
         return Response.Result(0, list);
     }
 
-
     @RequestMapping(value = "/detailNodeList", method = RequestMethod.GET)
     @ResponseBody
     public Response detailNodeList(@RequestParam String address){
@@ -158,4 +157,17 @@ public class ClusterController {
         return Response.Result(0, res);
     }
 
+    @RequestMapping(value = "/beMaster", method = RequestMethod.GET)
+    @ResponseBody
+    public Response beMaster(@RequestParam String ip, @RequestParam int port, @RequestParam String masterId){
+        boolean res = logic.beMaster(ip, port, masterId);
+        return Response.Result(0, res);
+    }
+
+    @RequestMapping(value = "/forgetNode", method = RequestMethod.GET)
+    @ResponseBody
+    public Response forgetNode(@RequestParam String ip, @RequestParam int port, @RequestParam String masterId){
+        boolean res = logic.forgetNode(ip, port, masterId);
+        return Response.Result(0, res);
+    }
 }

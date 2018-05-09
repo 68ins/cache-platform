@@ -2,6 +2,7 @@ package com.newegg.ec.cache.plugin.basemodel;
 
 import com.newegg.ec.cache.app.component.RedisManager;
 import com.newegg.ec.cache.app.dao.IClusterDao;
+import com.newegg.ec.cache.app.logic.ClusterLogic;
 import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
@@ -21,7 +22,8 @@ public abstract class PluginParent {
     public static final String IPLIST_NAME = "iplist";
     public static final String IMAGE_URL = "imageUrl";
     @Resource
-    protected IClusterDao clusterDao;
+    protected ClusterLogic clusterLogic;
+
     @Resource
     private RedisManager redisManager;
 

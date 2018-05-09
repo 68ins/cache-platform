@@ -1,5 +1,12 @@
 $(document).ready(function(){
-  rebuildDockerNodeListTable();
+    var clusterId = getQueryString("clusterId");
+    getCluster(clusterId, function(obj){
+        var cluster = obj.res;
+        nodeList(cluster.address, function(obj){
+            window.nodeList = obj.res;
+            rebuildDockerNodeListTable( clusterId );
+        });
+    });
 });
 
 function rebuildDockerNodeListTable(){

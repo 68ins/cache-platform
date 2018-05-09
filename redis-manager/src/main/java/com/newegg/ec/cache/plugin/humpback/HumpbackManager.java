@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
 @Component
 public class HumpbackManager extends PluginParent implements INodeOperate,INodeRequest {
 
-    CommonLogger logger = new CommonLogger( HumpbackManager.class );
+    private static CommonLogger logger = new CommonLogger( HumpbackManager.class );
 
     static ExecutorService executorService = Executors.newFixedThreadPool(100);
     @Value("${cache.humpback.image}")
@@ -58,27 +58,28 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      */
     @Override
     public boolean pullImage(JSONObject pullParam) {
-
-        String ipStr = pullParam.getString("iplist");
+        boolean res = true;
+        String ipStr = pullParam.getString( PluginParent.IPLIST_NAME );
         Set<String> ipSet = JedisUtil.getIPList(ipStr);
-        String imageUrl = pullParam.getString("imageUrl");
-
-        List<Future<Boolean>> futureList = new ArrayList<>();
+        String imageUrl = pullParam.getString( PluginParent.IMAGE_URL );
+        logger.websocket("start pull image ");
+        List<Future<String>> futureList = new ArrayList<>();
         for(String ip : ipSet){
-            Future<Boolean> future = executorService.submit( new PullImageTask(ip, imageUrl) );
+            Future<String> future = executorService.submit( new PullImageTask(ip, imageUrl) );
             futureList.add( future );
         }
-        for(Future<Boolean> future : futureList){
+        for(Future<String> future : futureList){
             try {
-                if(!future.get()){
-                    //有一台机器pull image 失败返回true
-                    return false;
-                }
+                String pullRes = future.get();
+                logger.websocket( "pull image : " + pullRes );
             } catch (Exception e) {
+                res = false;
+                logger.websocket( e.getMessage() );
                 logger.error("",e);
             }
         }
-        return true;
+        logger.websocket("pull image is finish");
+        return res;
     }
 
     /**
@@ -135,7 +136,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     public boolean remove(JSONObject removePram) {
         System.out.println(removePram);
-       // logger.websocket( removePram.toString() );
+        logger.websocket( removePram.toString() );
         String ip = removePram.getString("ip");
         String containerId = removePram.getString("containerId");
         try {
@@ -194,14 +195,14 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     protected void installNodeList(JSONObject reqParam, List<RedisNode> nodelist) {
         String image = reqParam.getString("imageUrl");
-
+        String containerName = reqParam.getString("containerName");
         List<Future<Boolean>> futureList = new ArrayList<>();
         nodelist.forEach(node -> {
             String ip = String.valueOf(node.getIp());
             String port = String.valueOf(node.getPort());
-            String name = "redis" + port;
-            String command = ip + ":" + port;
-            JSONObject reqObject = generateInstallObjerct(image, name, command);
+            String name = containerName + port;
+            String command = ip + " " + port;
+            JSONObject reqObject = generateInstallObject(image, name, command);
             futureList.add(executorService.submit(new RedisInstallTask(ip, reqObject)));
         });
 
@@ -222,7 +223,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      * @param command
      * @return
      */
-    private JSONObject generateInstallObjerct(String image, String name, String command){
+    private JSONObject generateInstallObject(String image, String name, String command){
 
         JSONObject reqObject =  new JSONObject();
 
@@ -250,6 +251,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      */
     @Override
     protected int addCluster(JSONObject reqParam) {
+        int clusterId = -1;
         String ipListStr = reqParam.getString(IPLIST_NAME);
         List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
         RedisNode node = new RedisNode();
@@ -262,14 +264,12 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         if(StringUtils.isNotEmpty(node.getIp())){
             Cluster cluster = new Cluster();
             cluster.setAddress(node.getIp() + ":" + node.getPort());
-            cluster.setUserGroup(reqParam.get("group").toString());
+            cluster.setUserGroup(reqParam.get("userGroup").toString());
             cluster.setClusterType(reqParam.get("pluginType").toString());
             cluster.setClusterName(reqParam.get("clusterName").toString());
-            if( clusterDao.addCluster(cluster) == 1){
-                return cluster.getId();
-            }
+            clusterId = clusterLogic.addCluster( cluster );
         }
-        return -1;
+        return clusterId;
     }
 
     /**
@@ -281,19 +281,19 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     protected void addNodeList(JSONObject reqParam, int clusterId) {
         String ipListStr = reqParam.getString(IPLIST_NAME);
         String image = reqParam.getString(IMAGE_URL);
+        String containerName = reqParam.getString("containerName");
         List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
-        nodelist.forEach(node -> {
+        for(RedisNode node : nodelist){
             HumpbackNode humpbackNode = new HumpbackNode();
             humpbackNode.setClusterId(clusterId);
-            humpbackNode.setContainerName("redis" + node.getPort());
-            humpbackNode.setUserGroup(reqParam.get("group").toString());
+            humpbackNode.setContainerName( containerName + node.getPort());
+            humpbackNode.setUserGroup(reqParam.get("userGroup").toString());
             humpbackNode.setImage(image);
             humpbackNode.setIp(node.getIp());
             humpbackNode.setPort(node.getPort());
             humpbackNode.setAddTime(DateUtil.getTime());
             humpbackNodeDao.addHumbackNode(humpbackNode);
-        });
-
+        }
     }
 
     /**
@@ -358,7 +358,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     /**
      * pull images task
      */
-    class PullImageTask implements Callable<Boolean> {
+    class PullImageTask implements Callable<String> {
         private String image;
         private String ip;
         public PullImageTask(String ip, String image){
@@ -367,15 +367,16 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         }
 
         @Override
-        public Boolean call() throws Exception {
-            boolean res = true;
+        public String call() throws Exception {
+            String res = "";
             try {
                 JSONObject reqObject = new JSONObject();
                 reqObject.put("Image", this.image);
-                String url = getApiAddress(ip)+IMAGE_OPTION_API;
+                String url = getApiAddress(ip) + IMAGE_OPTION_API;
+                res = logger.websocket( "start pull image " + url );
                 HttpClientUtil.getPostResponse(url, reqObject);
             }catch (Exception e){
-                res = false;
+                res = logger.websocket( e.getMessage() );
             }
             return res;
         }

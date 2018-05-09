@@ -19,8 +19,8 @@
          <tr>
              <td  style="width:10px"> </td>
              <td  class="display-hide">{{$docker.id}}</td>
-             <td>OK</td>
-             <td>YES</td>
+             <td id="status-{{$docker.id}}">{{service_status  ip=$docker.ip port=$docker.port id=$docker.id}}</td>
+             <td id="in-cluster-{{$docker.id}}">{{in_cluster ip=$docker.ip port=$docker.port id=$docker.id}}</td>
              <td>{{$docker.containerName}}</td>
              <td>{{$docker.image}}</td>
              <td>{{$docker.ip}}</td>

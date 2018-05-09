@@ -70,7 +70,7 @@ public class CreateClusterLogHandler implements WebSocketHandler {
 
     public static synchronized void appendLog(String clusterid, String msg){
         WebSocketSession webSocketSession = webSocketAndClustertable.get( clusterid );
-        if( null != webSocketSession ){
+        if( webSocketSession.isOpen() ){
             appendLog( webSocketSession, msg );
         }
     }

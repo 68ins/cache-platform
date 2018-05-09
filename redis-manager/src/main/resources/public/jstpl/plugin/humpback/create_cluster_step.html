@@ -4,8 +4,8 @@
         <tr class="input-format">
             <td class="container-table-tag">Cluster Name</td>
             <td>
-                <input name="clusterId" type="text" class="form-control" data-ajax-type="get"  placeholder="cluster-name"  data-require="1" data-len="3-20" data-len-msg="length range5-20" data-format="[a-zA-Z0-9_]+" data-format-msg="only support letter and number or _"  data-server-check="/check/checkClusterName"  >
-                <div id="clusterId_tip"></div>
+                <input name="clusterName" data-alias="clusterId" type="text" class="form-control" data-ajax-type="get"  placeholder="cluster-name"  data-require="1" data-len="3-20" data-len-msg="length range5-20" data-format="[a-zA-Z0-9_]+" data-format-msg="only support letter and number or _"  data-server-check="/check/checkClusterName"  >
+                <div id="clusterName_tip"></div>
             </td>
         </tr>
         </tbody>
@@ -14,7 +14,7 @@
         <br>
         <p>Select image for redis install</p>
         <div class="form-inline" style="height:55px">
-            <select name="image" class="form-control" data-live-search="true" data-require="1">
+            <select name="imageUrl" class="form-control" data-live-search="true" data-require="1">
                 <option></option>
                 {{foreach from=$res item=image}}
                 <option>{{$image}}</option>
