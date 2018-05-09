@@ -338,6 +338,24 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     }
 
     /**
+     * 获取container 信息
+     * @param ip
+     * @param containerId
+     * @return
+     */
+    public JSONObject getContainerInfo(String ip, String containerId) {
+
+        String response = null;
+        try {
+            String url = getApiAddress(ip) + CONTAINER_OPTION_API;
+            response = HttpClientUtil.getGetResponse(url, containerId);
+        } catch (IOException e) {
+            logger.error("",e);
+        }
+        return JSONObject.fromObject(response);
+    }
+
+    /**
      * pull images task
      */
     class PullImageTask implements Callable<Boolean> {

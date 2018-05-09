@@ -99,6 +99,10 @@ public class HumpackOptionTest {
 
     }
 
+    @Test
+    public void testgetContainerInfo() {
+        System.out.println(humpback.getContainerInfo("172.16.35.219", "itemserviceSSL"));
+    }
 
     @Test
     public void testInstall() {
