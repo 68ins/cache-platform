@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by gl49 on 2018/4/22.
@@ -26,6 +27,12 @@ public class CheckLogic {
 
     private String checkLog(String msg){
         return logger.websocket(msg) + "<br>";
+    }
+
+    public int checkRedisVersion(String address) {
+        Host host = NetUtil.getHostPassAddress( address );
+        int version = JedisUtil.getRedisVersion(host.getIp(), host.getPort());
+        return version;
     }
 
     public Response checkPortPass(String ip, int port, boolean isPass){

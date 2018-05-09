@@ -21,6 +21,14 @@ import javax.annotation.Resource;
 public class CheckController {
     @Resource
     private CheckLogic logic;
+
+    @RequestMapping("/checkVersion")
+    @ResponseBody
+    public Response checkRedisVersion(@RequestParam String address){
+        int version = logic.checkRedisVersion(address);
+        return Response.Result(0, version);
+    }
+
     @RequestMapping("/checkPortPass")
     @ResponseBody
     public Response checkPortPass(@RequestParam String ip, @RequestParam int port){

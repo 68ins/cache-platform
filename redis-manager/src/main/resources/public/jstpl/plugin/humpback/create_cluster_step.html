@@ -1,5 +1,5 @@
-<div class="col-md-6">
-    <table class="table table-bordered" id="create-create-cluster">
+<div class="col-md-6" id="create-cluster-form">
+    <table class="table table-bordered">
         <tbody>
         <tr class="input-format">
             <td class="container-table-tag">Cluster Name</td>
@@ -24,7 +24,7 @@
         <br>
         <span style="color:#5d5c5c;"> <span class="glyphicon glyphicon-info-sign"></span> If without image you should push of redis image</span>
     </div>
-    <table class="table table-bordered" id="docker-container-form">
+    <table class="table table-bordered">
         <tbody>
         <tr class="input-format">
             <td class="container-table-tag">Team</td>
@@ -38,12 +38,13 @@
             <td class="container-table-tag">Container Name </td>
             <td>
                 <input name="containerName" type="text" class="form-control" data-require="1" data-len="5-20" data-len-msg="length range 5-20" data-format-msg="only support letter and number" placeholder="redis1234">
+                <div id="containerName_tip"></div>
             </td>
         </tr>
-        <tr class="pointer batch-ip-list" >
+        <tr class="pointer" >
             <td class="container-table-tag" >Batch IP List </td>
             <td colspan="3">
-                <div class="node-value text-value ip-list-value">
+                <div class="node-value text-value">
                     <textarea class="host-list form-control" rows="6" name="iplist"  data-require="1" data-server-check="/check/checkBatchHostNotPass,/check/checkBatchHumpbackContainerName"  placeholder="example 127.0.0.1:8008" ></textarea>
                     <div id="iplist_tip"></div>
                 </div>
@@ -51,7 +52,7 @@
         </tr>
         </tbody>
     </table>
-    <button class="btn btn-default" id="set-master-finish">create cluster</button>
+    <button class="btn btn-default" id="start-install-cluster">create cluster</button>
 </div><!-- .col-md-6 -->
 <div class="col-md-6">
     <div class="panel panel-default">

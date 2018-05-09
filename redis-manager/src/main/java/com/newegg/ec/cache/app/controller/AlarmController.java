@@ -41,9 +41,9 @@ public class AlarmController {
         return Response.Result(0, res);
     }
 
-    @RequestMapping(value = "/checkRule", method = RequestMethod.POST)
+    @RequestMapping(value = "/checkAlarmRule", method = RequestMethod.POST)
     @ResponseBody
-    public Response checkRule(@RequestBody ClusterCheckRule rule){
+    public Response checkAlarmRule(@RequestBody ClusterCheckRule rule){
        Boolean check = logic.checkRule(rule);
         if(check){
             return Response.Info("success!");
