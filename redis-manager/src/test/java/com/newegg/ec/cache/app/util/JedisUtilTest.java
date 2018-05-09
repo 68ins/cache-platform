@@ -2,7 +2,6 @@ package com.newegg.ec.cache.app.util;
 
 import com.newegg.ec.cache.app.model.RedisNode;
 import org.junit.Test;
-import redis.clients.jedis.Jedis;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +52,8 @@ public class JedisUtilTest {
         System.out.println( res );
         Set<String> ipSet = JedisUtil.getIPList( ipListStr );
         System.out.println( ipSet );
+        System.out.println(JedisUtil.getInstallNodeList(ipListStr));
+        System.out.println(JedisUtil.getInstallNodeList(ipListStr).size());
     }
 
     @Test
@@ -67,9 +68,11 @@ public class JedisUtilTest {
                 "127.0.0.1:8087\n" +
                 "127.0.0.1:8088";
         String ipListStr1 = "127.0.0.1:8080";
-        Map<RedisNode, List<RedisNode>> res = JedisUtil.getInstallNodeMap( ipListStr1 );
+        Map<RedisNode, List<RedisNode>> res = JedisUtil.getInstallNodeMap(ipListStr1);
         System.out.println( res );
         Set<String> ipSet = JedisUtil.getIPList( ipListStr );
         System.out.println( ipSet );
+        System.out.println(JedisUtil.getInstallNodeList(ipListStr));
+        System.out.println(JedisUtil.getInstallNodeList(ipListStr).size());
     }
 }

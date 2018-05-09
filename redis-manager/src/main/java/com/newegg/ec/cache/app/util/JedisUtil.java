@@ -7,7 +7,6 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.util.Slowlog;
-import sun.nio.ch.Net;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -434,4 +433,29 @@ public class JedisUtil {
         }
         return resMap;
     }
+
+    public static  List<RedisNode> getInstallNodeList(String nodeStr){
+
+        List<RedisNode> list = new LinkedList();
+        String[] nodeArr = nodeStr.split("\n");
+        for(String node : nodeArr){
+                RedisNode nodeItem = new RedisNode();
+                String[] tmpArr = node.split("\\s+");
+                String hostStr = tmpArr[0];
+                Host host = NetUtil.getHost( hostStr );
+                nodeItem.setIp( host.getIp() );
+                nodeItem.setPort(host.getPort());
+                if( tmpArr.length >= 1 ){
+                    nodeItem.setRole(RedisNodeType.slave);
+                }
+                if( tmpArr.length >= 2 ){
+                    if( tmpArr[1].equals("master") ){
+                        nodeItem.setRole(RedisNodeType.master);
+                    }
+                }
+                list.add(nodeItem);
+        }
+        return list;
+    }
+
 }

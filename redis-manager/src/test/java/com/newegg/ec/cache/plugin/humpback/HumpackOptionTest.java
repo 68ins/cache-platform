@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
+
 /**
  * Created by lf52 on 2018/5/8.
  */
@@ -95,5 +97,13 @@ public class HumpackOptionTest {
         System.out.println(humpback.createContainer("172.16.35.219",JSONObject.fromObject(param)));
 
 
+    }
+
+
+    @Test
+    public void testInstall() {
+        JSONObject param = new JSONObject();
+        param.put("imageUrl", "humpback-hub.newegg.org/shec/redis3.0.6:v3");
+        humpback.installNodeList(param,new ArrayList());
     }
 }
