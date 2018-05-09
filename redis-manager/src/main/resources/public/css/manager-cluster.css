@@ -1,18 +1,16 @@
 
 .header-swapper {
-	padding: 10px 0;
+	/*padding: 10px 0;
+	color: #000000;
+    font-weight: 600;*/
 }
 .main-swapper {
 	padding: 20px 10px;
+	background-color: #FFFFFF;
 }
 
 .main-swapper a{
 	color: #403D39;
-}
-
-.header-swapper {
-	color: #000000;
-	font-weight: 600;
 }
 
 .base-info-operation {
@@ -32,3 +30,12 @@
 	justify-content: flex-end;
 }
 
+.content-page {
+    position: absolute;
+    top: 150px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+}

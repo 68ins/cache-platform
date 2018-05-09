@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.newegg.ec.cache.dao.SupportedCommandDao">
+
+    <insert id="addSupportedCommand" parameterType="com.newegg.ec.cache.model.entity.SupportedCommand">
+        INSERT
+        INTO
+            cache_platform_machine_supported_command
+            (supported_command_id, command, update_time)
+        VALUES
+            (#{supportedCommandId}, #{command}, #{updateTime})
+    </insert>
+
+    <select id="selectSupportedCommandList" resultType="com.newegg.ec.cache.model.entity.SupportedCommand">
+        SELECT
+            supported_command_id, command
+        FROM
+            cache_platform_machine_supported_command
+        ORDER BY
+            update_time ASC
+    </select>
+
+    <select id="selectSupportedCommandById" parameterType="java.lang.String" resultType="com.newegg.ec.cache.model.entity.SupportedCommand">
+        SELECT
+            supported_command_id, command
+        FROM
+            cache_platform_machine_supported_command
+        WHERE
+            supported_command_id = #{supportedCommandId}
+    </select>
+
+    <select id="selectSupportedCommandByCommand" parameterType="java.lang.String" resultType="com.newegg.ec.cache.model.entity.SupportedCommand">
+        SELECT
+            supported_command_id
+        FROM
+            cache_platform_machine_supported_command
+        WHERE
+            command = #{command}
+    </select>
+
+    <delete id="deleteSupportedCommandById" parameterType="java.lang.String">
+        DELETE
+        FROM
+            cache_platform_machine_supported_command
+        WHERE
+            supported_command_id = #{supportedCommandId}
+    </delete>
+</mapper>

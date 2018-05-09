@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+
+    <task:scheduled-tasks>
+        <!-- 这里表示的是每隔两分钟秒执行一次 -->
+        <task:scheduled ref="earlyWarningJob" method="run" cron="*/120 * * * * ?" />
+        <task:scheduled ref="machineInfoJob" method="run" cron="*/120 * * * * ?" />
+        <task:scheduled ref="clearMonitorInfoLogJob" method="run" cron="0 0 1 * * ? " />
+    </task:scheduled-tasks>
+
+</beans>
