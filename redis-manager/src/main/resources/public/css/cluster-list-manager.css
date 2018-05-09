@@ -53,7 +53,7 @@
 } 
 
 .delete-container i:hover{  
-	color: red;
+	color: #ff6c60;
 	opacity: 1; 
 	transform:rotate(-180deg);
 }
@@ -83,6 +83,9 @@
 	margin: 0 0 5px 10px;
     font-size: 18px;
     font-weight: 200;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .see-details {

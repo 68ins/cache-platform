@@ -308,7 +308,7 @@ function makeCharts(theme, bgColor, field, char_data_table) {
             fillAlphas: 0.8,
             balloonText: "[[title]] in [[category]]  <b>[[value]]</b>"
         }],
-        colors:	["#81b3b9"]
+        colors:	["#3fa7dc"]
     });
 }
 
