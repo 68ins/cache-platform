@@ -3,7 +3,6 @@ package com.newegg.ec.cache.plugin.humpback;
 import com.google.common.collect.Lists;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
-import com.newegg.ec.cache.app.util.HttpUtil;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
@@ -40,6 +39,7 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
     private String humpbackApiFormat;
 
     private static final String CONTAINER_OPTION_API = "containers";
+    private static final String IMAGE_OPTION_API = "images";
 
     @Autowired
     IHumpbackNodeDao humpbackNodeDao;
@@ -70,6 +70,14 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
 
     @Override
     public boolean install(JSONObject installParam) {
+        //1.pull image
+        //2.create container
+        //3.add master to cluster
+        //4.init master (slot 分配)
+        //5.add slave to cluster
+        //6.be slave(设置slave的身份)
+
+
         return false;
     }
 
@@ -153,9 +161,8 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
             try {
                 JSONObject reqObject = new JSONObject();
                 reqObject.put("Image", this.image);
-                String url = getApiAddress(ip);
-                System.out.println( url + reqObject );
-                HttpUtil.jsonPost(url, reqObject);
+                String url = getApiAddress(ip)+IMAGE_OPTION_API;
+                HttpClientUtil.getPostResponse(url, reqObject);
             }catch (Exception e){
                 res = false;
             }
