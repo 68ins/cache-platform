@@ -151,4 +151,11 @@ public class ClusterController {
         return Response.Result(0, detailNodeList);
     }
 
+    @RequestMapping(value = "/beSlave", method = RequestMethod.GET)
+    @ResponseBody
+    public Response beSlave(@RequestParam String ip, @RequestParam int port, @RequestParam String masterId){
+        boolean res = logic.beSlave(ip, port, masterId);
+        return Response.Result(0, res);
+    }
+
 }

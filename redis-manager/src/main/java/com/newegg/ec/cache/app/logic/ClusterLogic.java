@@ -160,4 +160,8 @@ public class ClusterLogic {
         }
         return listCluster;
     }
+
+    public boolean beSlave(String ip, int port, String masterId) {
+        return redisManager.beSlave(ip, port, masterId);
+    }
 }
