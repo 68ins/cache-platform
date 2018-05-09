@@ -1,15 +1,16 @@
 package com.newegg.ec.cache.plugin.humpback;
 
 import com.google.common.collect.Lists;
+import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
-import com.newegg.ec.cache.app.util.HttpUtil;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.Node;
+import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import java.util.concurrent.Future;
  * Created by lzz on 2018/4/20.
  */
 @Component
-public class HumpbackManager implements INodeOperate,INodeRequest {
+public class HumpbackManager extends PluginParent implements INodeOperate,INodeRequest {
 
     CommonLogger logger = new CommonLogger( HumpbackManager.class );
 
@@ -40,6 +41,7 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
     private String humpbackApiFormat;
 
     private static final String CONTAINER_OPTION_API = "containers";
+    private static final String IMAGE_OPTION_API = "images";
 
     @Autowired
     IHumpbackNodeDao humpbackNodeDao;
@@ -50,9 +52,11 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
 
     @Override
     public boolean pullImage(JSONObject pullParam) {
+
         String ipStr = pullParam.getString("iplist");
         Set<String> ipSet = JedisUtil.getIPList(ipStr);
         String imageUrl = pullParam.getString("imageUrl");
+
         List<Future<Boolean>> futureList = new ArrayList<>();
         for(String ip : ipSet){
             Future<Boolean> future = executorService.submit( new PullImageTask(ip, imageUrl) );
@@ -60,17 +64,20 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
         }
         for(Future<Boolean> future : futureList){
             try {
-                future.get();
+                if(!future.get()){
+                    //有一台机器pull image 失败返回true
+                    return false;
+                }
             } catch (Exception e) {
-
+                logger.error("",e);
             }
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean install(JSONObject installParam) {
-        return false;
+        return installTemplate(this, installParam);
     }
 
     @Override
@@ -96,12 +103,12 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
 
     @Override
     public boolean remove(JSONObject removePram) {
-        System.out.println( removePram );
-        logger.websocket( removePram.toString() );
+        System.out.println(removePram);
+       // logger.websocket( removePram.toString() );
         String ip = removePram.getString("ip");
         String containerId = removePram.getString("containerId");
         try {
-            String url = getApiAddress( ip );
+            String url = getApiAddress( ip )+CONTAINER_OPTION_API;
             if( HttpClientUtil.getDeleteResponse(url, containerId ) == null) {
                 return false;
             }
@@ -115,7 +122,7 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
     @Override
     public List<String> getImageList() {
         User user  = RequestUtil.getUser();
-        System.out.println( user );
+        System.out.println(user);
         return Lists.newArrayList(humpbackImage.split(","));
     }
 
@@ -136,31 +143,39 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
     }
 
     public String getApiAddress(String ip){
-        return String.format( humpbackApiFormat,  ip);
+        return String.format(humpbackApiFormat, ip);
     }
 
-    class PullImageTask implements Callable<Boolean> {
-        private String image;
-        private String ip;
-        public PullImageTask(String ip, String image){
-            this.ip = ip;
-            this.image = image;
-        }
 
-        @Override
-        public Boolean call() throws Exception {
-            boolean res = true;
-            try {
-                JSONObject reqObject = new JSONObject();
-                reqObject.put("Image", this.image);
-                String url = getApiAddress(ip);
-                System.out.println( url + reqObject );
-                HttpUtil.jsonPost(url, reqObject);
-            }catch (Exception e){
-                res = false;
-            }
-            return res;
+    /**
+     * table humpback_node 写入数据
+     * @param reqParam
+     * @param clusterId
+     */
+    @Override
+    protected void addNodeList(JSONObject reqParam, int clusterId) {
+        System.out.println("add node list");
+    }
+
+
+    @Override
+    protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
+        System.out.println("install node list");
+    }
+
+    /**
+     * table cluster 写入数据
+     * @param reqParam
+     * @return
+     */
+    @Override
+    protected int addCluster(JSONObject reqParam) {
+        Cluster cluster = new Cluster();
+        if(1==0){
+            this.clusterDao.addCluster(cluster);
         }
+        System.out.println("add cluster");
+        return 0;
     }
 
     /**
@@ -186,5 +201,48 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
         return true;
     }
 
+    /**
+     * create  container 创建失败会返回一个空的json串
+     * @param ip
+     * @param param
+     * @return
+     */
+    public JSONObject createContainer(String ip, JSONObject param) {
+
+        String response = null;
+        try {
+            String url = getApiAddress(ip) + CONTAINER_OPTION_API;
+            response = HttpClientUtil.getPostResponse(url,param);
+        } catch (IOException e) {
+            logger.error("",e);
+        }
+        return JSONObject.fromObject(response);
+    }
+
+    /**
+     * pull images task
+     */
+    class PullImageTask implements Callable<Boolean> {
+        private String image;
+        private String ip;
+        public PullImageTask(String ip, String image){
+            this.ip = ip;
+            this.image = image;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+            boolean res = true;
+            try {
+                JSONObject reqObject = new JSONObject();
+                reqObject.put("Image", this.image);
+                String url = getApiAddress(ip)+IMAGE_OPTION_API;
+                HttpClientUtil.getPostResponse(url, reqObject);
+            }catch (Exception e){
+                res = false;
+            }
+            return res;
+        }
+    }
 
 }

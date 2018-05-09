@@ -58,15 +58,18 @@
 }
 
 .total-icon {
-	background-color: #46b8da;
+    background-color: #57c8f2;
+	/*background-color: #46b8da;*/
 }
 
 .good-icon {
-	background-color: #009F95;
+    background-color: #6ccac9;
+	/*background-color: #009F95;*/
 }
 
 .bad-icon {
-	background-color: #FF5722;
+    background-color: #ff6c60;
+	/*background-color: #FF5722;*/
 }
 
 .keys-icon {
@@ -74,7 +77,8 @@
 }
 
 .warning-icon {
-	background-color: #FFB800;
+    background-color: #f8d347;
+	/*background-color: #FFB800;*/
 }
 
 .icon-chart {

@@ -46,7 +46,8 @@
 
 /*cluster or one node base info*/
 .label-success {
-    background-color: #5cb85c;
+    background-color: #41cac0;
+    /*background-color: #5cb85c;*/
     color: #FFFFFF;
     padding: 0 5px;
 }
@@ -107,7 +108,7 @@
     color: #FFFFFF;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    background-color: #81b3b9;
+    background-color: #2a3542;
 }
 
 .title {
@@ -123,7 +124,7 @@
 }
 
 .select-hover:hover, .selected{
-    background-color: #81b3b9;
+    background-color: #3fa7dc;
     color: #fff;
 }
 
@@ -141,7 +142,7 @@
 
 .top_request_monitor{
     cursor:pointer;
-    color:#5bc0de;
+    color: #3fa7dc;
 }
 
 .base-info-list a {

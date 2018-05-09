@@ -300,16 +300,12 @@ function buildLineChart(name,containerId,data){
                         orient: 'vertical',
                         left: '86%',
                         top: '21%'
-                        /*"bottom": 10,
-                        "right": "center",
-                        "itemWidth": 8,
-                        "itemHeight": 8*/
                 },
                 color: [
-                          '#c23531','#bda29a','#61a0a8',
-                          '#304554','#d58165','#bda29a','#91c7ae',
+                          '#304554','#bda29a','#546570','#61a0a8',
+                          '#d58165','#bda29a','#91c7ae',
                           '#434348',
-                          '#bda29a','#C6E579','#26C0C0','#F0805A','#F4E001',
+                          '#C6E579','#26C0C0','#F0805A','#F4E001',
                           '#B5C334'
                       ],
                 title : {
@@ -324,10 +320,6 @@ function buildLineChart(name,containerId,data){
                     right: '16%',
                     bottom: 5,
                     top: '25%',
-                    /*x: '3%',
-                    y: '15%',
-                    x2: '20%',
-                    y2: '10%',*/
                     containLabel: true
                 },
                 toolbox: {
@@ -355,7 +347,8 @@ function buildLineChart(name,containerId,data){
                 },
                 series: []
             };
-
+        console.log(data.timeSpan);
+        console.log(data.detail);
         //动态拼接series
         for (i = 0; i < data.detail.length; i++) {
             var datainfo = data.detail[i];
@@ -376,8 +369,6 @@ function buildLineChart(name,containerId,data){
                         ]
                     }
                 }
-
-
                 legendData.push(datainfo.name);
                 series.push(item);
             }
