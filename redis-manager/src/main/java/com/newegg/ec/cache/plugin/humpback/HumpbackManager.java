@@ -122,7 +122,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     public List<String> getImageList() {
         User user  = RequestUtil.getUser();
-        System.out.println( user );
+        System.out.println(user);
         return Lists.newArrayList(humpbackImage.split(","));
     }
 
@@ -143,7 +143,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     }
 
     public String getApiAddress(String ip){
-        return String.format( humpbackApiFormat,  ip);
+        return String.format(humpbackApiFormat, ip);
     }
 
 
@@ -170,6 +170,37 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         }
     }
 
+    @Override
+    protected void addNodeList(JSONObject reqParam, int clusterId) {
+        System.out.println("add node list");
+    }
+
+    @Override
+    protected void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap) {
+        redisManager.buildCluster(ipMap);
+    }
+
+    @Override
+    protected boolean checkInstallResult(Set<String> ipSet) {
+        System.out.printf(" check install result ");
+        return false;
+    }
+
+    @Override
+    protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
+        System.out.println("install node list");
+    }
+
+    @Override
+    protected int addCluster(JSONObject reqParam) {
+        Cluster cluster = new Cluster();
+        if(1==0){
+            this.clusterDao.addCluster(cluster);
+        }
+        System.out.println("add cluster");
+        return 0;
+    }
+
     /**
      * container option
      * @param ip
@@ -193,30 +224,22 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         return true;
     }
 
+    /**
+     * create  container 创建失败会返回一个空的json串
+     * @param ip
+     * @param param
+     * @return
+     */
+    public JSONObject createContainer(String ip, JSONObject param) {
 
-    @Override
-    protected void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap) {
-        redisManager.buildCluster(ipMap);
-    }
-
-    @Override
-    protected boolean checkInstallResult(Set<String> ipSet) {
-        System.out.printf(" check install result ");
-        return false;
-    }
-
-    @Override
-    protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
-        System.out.println( "install node list" );
-    }
-
-    @Override
-    protected int addCluster(JSONObject reqParam) {
-        Cluster cluster = new Cluster();
-        if(1==0){
-            this.clusterDao.addCluster(cluster);
+        String response = null;
+        try {
+            String url = getApiAddress(ip) + CONTAINER_OPTION_API;
+            response = HttpClientUtil.getPostResponse(url,param);
+        } catch (IOException e) {
+            logger.error("",e);
         }
-        System.out.println( "add cluster" );
-        return 0;
+        return JSONObject.fromObject(response);
     }
+
 }

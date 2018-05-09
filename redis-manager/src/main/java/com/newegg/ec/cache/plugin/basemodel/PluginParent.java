@@ -19,25 +19,28 @@ public abstract class PluginParent {
     protected IClusterDao clusterDao;
 
     public boolean installTemplate(PluginParent pluginParent, JSONObject reqParam){
-        String ipListStr = reqParam.getString( IPLIST_NAME );
-        Map<Map<String, String>, List<Map<String, String>>> ipMap = JedisUtil.getInstallNodeMap( ipListStr );
+        String ipListStr = reqParam.getString(IPLIST_NAME);
+        Map<Map<String, String>, List<Map<String, String>>> ipMap = JedisUtil.getInstallNodeMap(ipListStr);
         Set<String> ipSet = JedisUtil.getIPList( ipListStr );
-        boolean res = true;
-        int clusterId = pluginParent.addCluster(reqParam);
+        boolean res = false;
         // 安装节点
         pluginParent.installNodeList(reqParam, ipSet);
         // 判断节点是否成功
         boolean checkRes = pluginParent.checkInstallResult( ipSet );
         // 成功就更新 cluster address
         if( checkRes ){
+            res = true;
             // 建立集群
             pluginParent.buildRedisCluster( ipMap );
-        }else{ // 不成功就删除对应的 cluster
-            res = false;
-           clusterDao.removeCluster( clusterId );
+        }
+        if( res ){ // 如果安装成功
+            int clusterId = pluginParent.addCluster(reqParam);
+            pluginParent.addNodeList(reqParam, clusterId);    
         }
         return res;
     }
+
+    protected abstract void addNodeList(JSONObject reqParam, int clusterId);
 
     protected abstract void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap);
 
