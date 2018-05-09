@@ -36,8 +36,6 @@ import java.util.concurrent.Future;
 public class HumpbackManager extends PluginParent implements INodeOperate,INodeRequest {
 
     CommonLogger logger = new CommonLogger( HumpbackManager.class );
-    @Resource
-    private RedisManager redisManager;
 
     static ExecutorService executorService = Executors.newFixedThreadPool(100);
     @Value("${cache.humpback.image}")
@@ -173,17 +171,6 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     protected void addNodeList(JSONObject reqParam, int clusterId) {
         System.out.println("add node list");
-    }
-
-    @Override
-    protected void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap) {
-        redisManager.buildCluster(ipMap);
-    }
-
-    @Override
-    protected boolean checkInstallResult(Set<String> ipSet) {
-        System.out.printf(" check install result ");
-        return false;
     }
 
     @Override

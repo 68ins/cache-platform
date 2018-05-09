@@ -1,7 +1,9 @@
 package com.newegg.ec.cache.plugin.basemodel;
 
+import com.newegg.ec.cache.app.component.RedisManager;
 import com.newegg.ec.cache.app.dao.IClusterDao;
 import com.newegg.ec.cache.app.util.JedisUtil;
+import com.newegg.ec.cache.app.util.NetUtil;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
@@ -17,6 +19,8 @@ public abstract class PluginParent {
     public static final String IPLIST_NAME = "iplist";
     @Resource
     protected IClusterDao clusterDao;
+    @Resource
+    private RedisManager redisManager;
 
     public boolean installTemplate(PluginParent pluginParent, JSONObject reqParam){
         String ipListStr = reqParam.getString(IPLIST_NAME);
@@ -42,11 +46,22 @@ public abstract class PluginParent {
 
     protected abstract void addNodeList(JSONObject reqParam, int clusterId);
 
-    protected abstract void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap);
-
-    protected abstract boolean checkInstallResult(Set<String> ipSet);
-
     protected abstract void installNodeList(JSONObject reqParam, Set<String> ipSet);
 
     protected abstract int addCluster(JSONObject reqParam);
+
+    protected void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap){
+        redisManager.buildCluster( ipMap );
+    }
+
+    protected boolean checkInstallResult(Set<String> ipSet){
+        boolean res = false;
+        for(String host : ipSet){
+            res = NetUtil.checkHost( host );
+            if( res ){
+                break;
+            }
+        }
+        return res;
+    }
 }
