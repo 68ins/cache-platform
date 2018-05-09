@@ -1,0 +1,44 @@
+<table id="humpbackNodeList" data-toggle="table" class="table table-hover table-bordered fixed-table-header"  >
+    <thead>
+    <tr >
+        <th  style="width:10px">#</th>
+        <th  class="display-hide">id</th>
+        <th  >Status</th>
+        <th  >InCluster</th>
+        <th  >Container Name</th>
+        <th  >Image Version</th>
+        <th  >Ip</th>
+        <th  >Port</th>
+        <th  >User Group</th>
+        <th  >AddTime</th>
+        <th  style="width:170px">Operation</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{foreach from=$res item=docker }}
+         <tr>
+             <td  style="width:10px"> </td>
+             <td  class="display-hide">{{$docker.id}}</td>
+             <td>OK</td>
+             <td>YES</td>
+             <td>{{$docker.containerName}}</td>
+             <td>{{$docker.image}}</td>
+             <td>{{$docker.ip}}</td>
+             <td>{{$docker.port}}</td>
+             <td>{{$docker.userGroup}}</td>
+             <td>{{$docker.addTime}}</td>
+             <td>
+                 <a href="/node/delete?pluginType=docker&containerName={{$docker.containerName}}" class="option-container">
+                     <button class="btn btn-danger btn-sm " type="button">Delete</button>&nbsp
+                 </a>
+                 <a href="/node/stop?pluginType=docker&containerName={{$docker.containerName}}" class="option-container">
+                     <button class="btn btn-primary btn-sm" type="button">Stop</button>&nbsp
+                 </a>
+                 <a href="/node/start?pluginType=docker&containerName={{$docker.containerName}}" class="option-container">
+                     <button class="btn btn-primary btn-sm" type="button">start</button>
+                 </a>
+             </td>
+         </tr>
+     {{/foreach}}
+    </tbody>
+</table>

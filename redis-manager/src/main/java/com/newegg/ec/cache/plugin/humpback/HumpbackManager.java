@@ -5,7 +5,6 @@ import com.newegg.ec.cache.app.component.RedisManager;
 import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
-import com.newegg.ec.cache.app.util.HttpUtil;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
@@ -47,6 +46,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     private String humpbackApiFormat;
 
     private static final String CONTAINER_OPTION_API = "containers";
+    private static final String IMAGE_OPTION_API = "images";
 
     @Autowired
     IHumpbackNodeDao humpbackNodeDao;
@@ -161,9 +161,8 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
             try {
                 JSONObject reqObject = new JSONObject();
                 reqObject.put("Image", this.image);
-                String url = getApiAddress(ip);
-                System.out.println( url + reqObject );
-                HttpUtil.jsonPost(url, reqObject);
+                String url = getApiAddress(ip)+IMAGE_OPTION_API;
+                HttpClientUtil.getPostResponse(url, reqObject);
             }catch (Exception e){
                 res = false;
             }

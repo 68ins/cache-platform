@@ -23,8 +23,13 @@ public class MachineManagerHtmlController {
     }
 
     @RequestMapping("/systemconfig")
-    public String systemConfig(Model model) {
+    public String systemconfig(Model model) {
         return "systemconfig";
+    }
+
+    @RequestMapping("/supportedCommand")
+    public String supportedCommand(Model model) {
+        return "supportedCommand";
     }
 
     @RequestMapping("/earlywarning")

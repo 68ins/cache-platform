@@ -4,6 +4,7 @@ import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.*;
 import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,6 +16,10 @@ import java.util.List;
 public class MachineManager implements INodeOperate,INodeRequest {
 
     private int userId;
+
+    @Autowired
+    IMachineNodeDao  machineNodeDao;
+
     public MachineManager(){
         //ignore
     }
@@ -61,7 +66,7 @@ public class MachineManager implements INodeOperate,INodeRequest {
 
     @Override
     public List<Node> getNodeList(int clusterId) {
-        return null;
+        return machineNodeDao.getMachineNodeList(clusterId);
     }
 
     @Override

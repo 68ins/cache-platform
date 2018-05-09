@@ -19,6 +19,8 @@ spring:
 
 mybatis:
   mapper-locations: classpath*:mappers/*.xml
+  configuration:
+    mapUnderscoreToCamelCase: true
 
 http:
    maxTotal: 10
@@ -27,3 +29,7 @@ http:
    connectionRequestTimeout: 5000
    socketTimeout: 3000
    staleConnectionCheckEnabled: true
+
+job:
+  warning:
+    time: 1200000
