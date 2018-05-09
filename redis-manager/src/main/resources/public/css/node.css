@@ -1,6 +1,5 @@
-.tab-position{
-    margin-bottom:5px;
-    padding: 15px;
+ .tab-position{
+    margin-bottom:5px
 }
 
 .sort-span{
@@ -29,17 +28,23 @@
 }
 
 /* main page */
-.data-container {
+
+.container-color, .data-container {
     background-color: #FFFFFF;
 }
 
+.header-swapper {
+    margin: 10px 0px;
+    padding: 2px 10px;
+}
+
 .main-swapper {
+    padding: 0 10px 10px;
     background-color: #FFFFFF;
 }
 
 .tab-content {
     margin-top: 15px;
-    padding: 0 15px 15px;
 }
 
 .pagination-support {
@@ -47,7 +52,6 @@
 }
 
 .pagination-support li {
-    display: inline-flex;
     margin-bottom: 10px;
     cursor: pointer;
 }
@@ -62,5 +66,11 @@
     margin: 10px 0px;
 }
 
+.node-body {
+    padding-top: 0;
+}
 
+.node-manager-tab {
+    margin: 0;
+}
 

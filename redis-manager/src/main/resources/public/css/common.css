@@ -3,7 +3,7 @@ html,body {
 	margin: 0px;
 	height: 100%;
 	width: 100%;
-	font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-family: "Open Sans","Helvetica Neue",Helvetica, Arial, sans-serif, -apple-system,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Arial;
 }
 
 h2 {
@@ -100,14 +100,15 @@ a, a:hover{
 .state-ok {
 	padding: 0 5px;
 	border-radius: 2px;
-	background-color: #76bd1d;
+	background-color: #6ccac9;
+	/*background-color: #76bd1d;*/
 	color:	#FFFFFF;
 }
 
 .state-fail {
 	padding: 0 5px;
 	border-radius: 2px;
-	background-color: #FF5722;
+	background-color: #ff6c60;
 	color:	#FFFFFF;
 }
 
@@ -158,13 +159,28 @@ a, a:hover{
 .operation-btn {
 	padding: 3px 10px;
 	border: 1px solid #DADADA;
-	border-radius: 2px;
+	border-radius: 3px;
 }
 
 .operation-btn:hover{
 	background: linear-gradient(to top, #F9F9F9, white);
 }
 
+
+.btn-default,
+.btn-default:focus,
+.btn-default:hover,
+.btn-default:active:hover,
+.btn-default:active:focus,
+.btn-default.active:focus,
+.btn-default.focus,
+.btn-default:active.focus,
+.btn-default:active.focus {
+    border: 1px solid #dadada;
+    outline: none;
+    background-color: #FFFFFF;
+    color: #333;
+}
 
 .btn-primary,
 .btn-primary:focus,
@@ -188,9 +204,9 @@ a, a:hover{
 .btn-warning.focus,
 .btn-warning:active.focus,
 .btn-warning:active.focus {
-    border: 1px solid #FFB800;
+    border: 1px solid #f8d347;
     outline: none;
-    background-color: #FFB800;
+    background-color: #f8d347;
     color: #FFFFFF;
 }
 
