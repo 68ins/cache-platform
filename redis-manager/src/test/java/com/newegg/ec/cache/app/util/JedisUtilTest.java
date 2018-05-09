@@ -53,4 +53,21 @@ public class JedisUtilTest {
         Set<String> ipSet = JedisUtil.getIPList( ipListStr );
         System.out.println( ipSet );
     }
+
+    @Test
+    public void testIplist2(){
+        String ipListStr = "127.0.0.1:8080 master\n" +
+                "127.0.0.1:8081\n" +
+                "127.0.0.1:8082 master\n" +
+                "127.0.0.1:8083 master\n" +
+                "127.0.0.2:8084\n" +
+                "127.0.0.1:8085\n" +
+                "127.0.0.1:8086\n" +
+                "127.0.0.1:8087\n" +
+                "127.0.0.1:8088";
+        Map<Map<String, String>, List<Map<String, String>>> res = JedisUtil.getInstallNodeMap( ipListStr );
+        System.out.println( res );
+        Set<String> ipSet = JedisUtil.getIPList( ipListStr );
+        System.out.println( ipSet );
+    }
 }

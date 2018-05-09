@@ -1,6 +1,8 @@
 package com.newegg.ec.cache.plugin.humpback;
 
 import com.google.common.collect.Lists;
+import com.newegg.ec.cache.app.component.RedisManager;
+import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
 import com.newegg.ec.cache.app.util.HttpUtil;
@@ -10,15 +12,18 @@ import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.Node;
+import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -29,9 +34,11 @@ import java.util.concurrent.Future;
  * Created by lzz on 2018/4/20.
  */
 @Component
-public class HumpbackManager implements INodeOperate,INodeRequest {
+public class HumpbackManager extends PluginParent implements INodeOperate,INodeRequest {
 
     CommonLogger logger = new CommonLogger( HumpbackManager.class );
+    @Resource
+    private RedisManager redisManager;
 
     static ExecutorService executorService = Executors.newFixedThreadPool(100);
     @Value("${cache.humpback.image}")
@@ -70,7 +77,7 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
 
     @Override
     public boolean install(JSONObject installParam) {
-        return false;
+        return installTemplate(this, installParam);
     }
 
     @Override
@@ -139,6 +146,7 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
         return String.format( humpbackApiFormat,  ip);
     }
 
+
     class PullImageTask implements Callable<Boolean> {
         private String image;
         private String ip;
@@ -187,4 +195,29 @@ public class HumpbackManager implements INodeOperate,INodeRequest {
     }
 
 
+    @Override
+    protected void buildRedisCluster(Map<Map<String, String>, List<Map<String, String>>> ipMap) {
+        redisManager.buildCluster(ipMap);
+    }
+
+    @Override
+    protected boolean checkInstallResult(Set<String> ipSet) {
+        System.out.printf(" check install result ");
+        return false;
+    }
+
+    @Override
+    protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
+        System.out.println( "install node list" );
+    }
+
+    @Override
+    protected int addCluster(JSONObject reqParam) {
+        Cluster cluster = new Cluster();
+        if(1==0){
+            this.clusterDao.addCluster(cluster);
+        }
+        System.out.println( "add cluster" );
+        return 0;
+    }
 }

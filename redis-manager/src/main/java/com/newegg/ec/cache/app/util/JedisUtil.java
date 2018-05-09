@@ -386,15 +386,19 @@ public class JedisUtil {
                     nodeItem.put("host", tmpArr[0]);
                     nodeItem.put("role", "slave");
                 }
-                if( tmpArr.length > 2 ){
+                if( tmpArr.length >= 2 ){
                     if( tmpArr[1].equals("master") ){
                         nodeItem.put("role", "master");
-                        nodeItem.put("username", tmpArr[2]);
-                        nodeItem.put("password", tmpArr[3]);
                         currentMaster = nodeItem;
+                        if( tmpArr.length == 4 ){
+                            nodeItem.put("username", tmpArr[2]);
+                            nodeItem.put("password", tmpArr[3]);
+                        }
                     }else{
-                        nodeItem.put("username", tmpArr[1]);
-                        nodeItem.put("password", tmpArr[2]);
+                        if( tmpArr.length == 3 ){
+                            nodeItem.put("username", tmpArr[1]);
+                            nodeItem.put("password", tmpArr[2]);
+                        }
                     }
                 }
                 if( resMap.get(currentMaster) == null ){

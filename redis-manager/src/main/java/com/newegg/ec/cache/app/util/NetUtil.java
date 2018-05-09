@@ -117,7 +117,15 @@ public class NetUtil {
         }
         return res;
     }
-
+    public static Host getHost(String hostStr){
+        Host host = new Host();
+        String[] tmp = hostStr.split(":");
+        String ip = tmp[0];
+        int port = Integer.parseInt(tmp[1]);
+        host.setIp( ip );
+        host.setPort( port );
+        return host;
+    }
     public static List<Host> getHostByAddress(String addressStr) {
         String[] addressArr = addressStr.split(",");
         List<Host> listHost = new ArrayList<>();

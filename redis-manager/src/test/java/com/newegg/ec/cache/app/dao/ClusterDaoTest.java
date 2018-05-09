@@ -57,4 +57,10 @@ public class ClusterDaoTest {
         System.out.println( clusterList );
     }
 
+    @Test
+    public void updateCluster(){
+        boolean res = clusterDao.updateClusterAddress(1, "10.16.46.192:8018");
+        System.out.println( res );
+    }
+
 }
