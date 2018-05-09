@@ -1,7 +1,6 @@
 package com.newegg.ec.cache.plugin.humpback;
 
 import com.google.common.collect.Lists;
-import com.newegg.ec.cache.app.component.RedisManager;
 import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
@@ -18,11 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -55,9 +52,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
 
     @Override
     public boolean pullImage(JSONObject pullParam) {
+
         String ipStr = pullParam.getString("iplist");
         Set<String> ipSet = JedisUtil.getIPList(ipStr);
         String imageUrl = pullParam.getString("imageUrl");
+
         List<Future<Boolean>> futureList = new ArrayList<>();
         for(String ip : ipSet){
             Future<Boolean> future = executorService.submit( new PullImageTask(ip, imageUrl) );
@@ -65,12 +64,15 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         }
         for(Future<Boolean> future : futureList){
             try {
-                future.get();
+                if(!future.get()){
+                    //有一台机器pull image 失败返回true
+                    return false;
+                }
             } catch (Exception e) {
-
+                logger.error("",e);
             }
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -101,12 +103,12 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
 
     @Override
     public boolean remove(JSONObject removePram) {
-        System.out.println( removePram );
-        logger.websocket( removePram.toString() );
+        System.out.println(removePram);
+       // logger.websocket( removePram.toString() );
         String ip = removePram.getString("ip");
         String containerId = removePram.getString("containerId");
         try {
-            String url = getApiAddress( ip );
+            String url = getApiAddress( ip )+CONTAINER_OPTION_API;
             if( HttpClientUtil.getDeleteResponse(url, containerId ) == null) {
                 return false;
             }
@@ -145,39 +147,27 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     }
 
 
-    class PullImageTask implements Callable<Boolean> {
-        private String image;
-        private String ip;
-        public PullImageTask(String ip, String image){
-            this.ip = ip;
-            this.image = image;
-        }
-
-        @Override
-        public Boolean call() throws Exception {
-            boolean res = true;
-            try {
-                JSONObject reqObject = new JSONObject();
-                reqObject.put("Image", this.image);
-                String url = getApiAddress(ip)+IMAGE_OPTION_API;
-                HttpClientUtil.getPostResponse(url, reqObject);
-            }catch (Exception e){
-                res = false;
-            }
-            return res;
-        }
-    }
-
+    /**
+     * table humpback_node 写入数据
+     * @param reqParam
+     * @param clusterId
+     */
     @Override
     protected void addNodeList(JSONObject reqParam, int clusterId) {
         System.out.println("add node list");
     }
+
 
     @Override
     protected void installNodeList(JSONObject reqParam, Set<String> ipSet) {
         System.out.println("install node list");
     }
 
+    /**
+     * table cluster 写入数据
+     * @param reqParam
+     * @return
+     */
     @Override
     protected int addCluster(JSONObject reqParam) {
         Cluster cluster = new Cluster();
@@ -227,6 +217,32 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
             logger.error("",e);
         }
         return JSONObject.fromObject(response);
+    }
+
+    /**
+     * pull images task
+     */
+    class PullImageTask implements Callable<Boolean> {
+        private String image;
+        private String ip;
+        public PullImageTask(String ip, String image){
+            this.ip = ip;
+            this.image = image;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+            boolean res = true;
+            try {
+                JSONObject reqObject = new JSONObject();
+                reqObject.put("Image", this.image);
+                String url = getApiAddress(ip)+IMAGE_OPTION_API;
+                HttpClientUtil.getPostResponse(url, reqObject);
+            }catch (Exception e){
+                res = false;
+            }
+            return res;
+        }
     }
 
 }
