@@ -14,7 +14,6 @@ import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.Node;
 import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
-import com.newegg.ec.cache.plugin.humpback.HumpbackNode;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,22 +57,6 @@ public class MachineManager extends PluginParent implements INodeOperate,INodeRe
      */
     @Override
     public boolean pullImage(JSONObject pullParam) {
-        Response response;
-        response = checkLogic.checkBatchDirPermission( pullParam );
-        if( response.getCode() > 0  ){
-            logger.websocket( response.getMsg() );
-            return false;
-        }
-        response = checkLogic.checkBatchUserPermisson( pullParam );
-        if( response.getCode() > 0  ){
-            logger.websocket( response.getMsg() );
-            return false;
-        }
-        response = checkLogic.checkBatchWgetPermission( pullParam );
-        if( response.getCode() > 0  ){
-            logger.websocket( response.getMsg() );
-            return false;
-        }
         return true;
     }
 
@@ -131,6 +114,15 @@ public class MachineManager extends PluginParent implements INodeOperate,INodeRe
     @Override
     public String showManager() {
         return "plugin/machine/machineNodeManager";
+    }
+
+    @Override
+    protected boolean checkInstall(JSONObject reqParam) {
+        Response checkRes =  checkLogic.checkMachineBatchInstall( reqParam );
+        if( checkRes.getCode() == Response.DEFAULT ){
+            return true;
+        }
+        return false;
     }
 
     @Override

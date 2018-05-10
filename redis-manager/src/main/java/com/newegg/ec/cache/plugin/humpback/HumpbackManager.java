@@ -1,10 +1,14 @@
 package com.newegg.ec.cache.plugin.humpback;
 
 import com.google.common.collect.Lists;
-import com.newegg.ec.cache.app.model.Cluster;
+import com.newegg.ec.cache.app.controller.check.CheckLogic;
 import com.newegg.ec.cache.app.model.RedisNode;
+import com.newegg.ec.cache.app.model.Response;
 import com.newegg.ec.cache.app.model.User;
-import com.newegg.ec.cache.app.util.*;
+import com.newegg.ec.cache.app.util.DateUtil;
+import com.newegg.ec.cache.app.util.HttpClientUtil;
+import com.newegg.ec.cache.app.util.JedisUtil;
+import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.INodeRequest;
@@ -13,11 +17,11 @@ import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +50,8 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
 
     @Autowired
     IHumpbackNodeDao humpbackNodeDao;
+    @Resource
+    CheckLogic checkLogic;
 
     public HumpbackManager(){
 
@@ -225,7 +231,6 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     private JSONObject generateInstallObject(String image, String name, String command){
 
         JSONObject reqObject =  new JSONObject();
-
         reqObject.put("Image", image);
         JSONArray volumes = new JSONArray();
         JSONObject volumeObj = new JSONObject();
@@ -241,6 +246,15 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         reqObject.put("Command", command);
 
         return reqObject;
+    }
+
+    @Override
+    protected boolean checkInstall(JSONObject reqParam) {
+        Response checkRes =  checkLogic.checkHumpbackBatchInstall( reqParam );
+        if( checkRes.getCode() == Response.DEFAULT ){
+            return true;
+        }
+        return false;
     }
 
     /**

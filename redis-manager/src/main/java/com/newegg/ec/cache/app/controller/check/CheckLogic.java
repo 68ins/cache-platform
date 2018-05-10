@@ -1,22 +1,17 @@
 package com.newegg.ec.cache.app.controller.check;
 
 import com.newegg.ec.cache.app.dao.IClusterDao;
-import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.Host;
 import com.newegg.ec.cache.app.model.Response;
-import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
 import com.newegg.ec.cache.app.util.RemoteShellUtil;
-import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -65,7 +60,8 @@ public class CheckLogic {
         return Response.Success();
     }
 
-    public  Response checkBatchHostNotPass(String iplist) {
+    public  Response checkBatchHostNotPass(JSONObject req) {
+        String iplist = req.getString("iplist");
         String errorMsg = "";
         String[] ipArr = iplist.split("\n");
         for(String line : ipArr) {
@@ -97,6 +93,34 @@ public class CheckLogic {
         }else{
             return Response.Success();
         }
+    }
+
+    public Response checkHumpbackBatchInstall(JSONObject req){
+        return Response.Success();
+    }
+    public Response checkMachineBatchInstall(JSONObject req){
+        Response response;
+        response = checkBatchHostNotPass( req );
+        if( response.getCode() > 0  ){
+            logger.websocket( response.getMsg() );
+            return response;
+        }
+        response = checkBatchDirPermission( req );
+        if( response.getCode() > 0  ){
+            logger.websocket( response.getMsg() );
+            return response;
+        }
+        response = checkBatchUserPermisson( req );
+        if( response.getCode() > 0  ){
+            logger.websocket( response.getMsg() );
+            return response;
+        }
+        response = checkBatchWgetPermission( req );
+        if( response.getCode() > 0  ){
+            logger.websocket( response.getMsg() );
+            return response;
+        }
+        return response;
     }
 
     public  Response checkBatchDirPermission(JSONObject req){

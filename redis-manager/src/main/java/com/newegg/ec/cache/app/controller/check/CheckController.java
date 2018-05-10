@@ -1,7 +1,5 @@
 package com.newegg.ec.cache.app.controller.check;
 
-import com.newegg.ec.cache.app.controller.security.WebSecurityConfig;
-import com.newegg.ec.cache.app.model.Common;
 import com.newegg.ec.cache.app.model.Response;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.MathExpressionCalculateUtil;
@@ -10,6 +8,7 @@ import com.newegg.ec.cache.core.userapi.UserAccess;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 
 /**
@@ -82,9 +81,7 @@ public class CheckController {
     @ResponseBody
     public Response checkBatchHostNotPass(@RequestBody String req){
         JSONObject jsonObject = JSONObject.fromObject( req );
-        String ipList = jsonObject.getString("iplist");
-        System.out.println( ipList );
-        return logic.checkBatchHostNotPass( ipList );
+        return logic.checkBatchHostNotPass( jsonObject );
     }
 
     @RequestMapping(value = "/checkBatchDirPermission", method = RequestMethod.POST)

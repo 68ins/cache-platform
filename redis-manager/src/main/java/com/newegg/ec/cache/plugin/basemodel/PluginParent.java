@@ -11,10 +11,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by gl49 on 2018/5/9.
@@ -30,6 +28,11 @@ public abstract class PluginParent {
     private RedisManager redisManager;
 
     public boolean installTemplate(PluginParent pluginParent, JSONObject reqParam){
+        //重新检查一下各种权限
+        boolean checkReq = pluginParent.checkInstall(reqParam);
+        if( !checkReq ){
+            return false;
+        }
         String ipListStr = reqParam.getString(IPLIST_NAME);
         Map<RedisNode, List<RedisNode>> ipMap = JedisUtil.getInstallNodeMap(ipListStr);
         List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
@@ -58,6 +61,8 @@ public abstract class PluginParent {
         }
         return res;
     }
+
+    protected abstract boolean checkInstall(JSONObject reqParam);
 
     protected abstract void addNodeList(JSONObject reqParam, int clusterId);
 
