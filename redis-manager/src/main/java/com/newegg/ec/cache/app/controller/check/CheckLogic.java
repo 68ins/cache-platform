@@ -109,9 +109,10 @@ public class CheckLogic {
             String installPath = req.getString("installPath");
             String cmd = getCheckDirPermission( installPath );
             RemoteShellUtil remoteShellUtil = new RemoteShellUtil(ip, username, password);
-            errorMsg += remoteShellUtil.exec(cmd);
+            errorMsg += logger.websocket( remoteShellUtil.exec(cmd) );
         }
         if( !StringUtils.isBlank( errorMsg ) ){
+            logger.websocket( errorMsg );
             return Response.Error( errorMsg );
         }
         return  Response.Success();
@@ -126,9 +127,10 @@ public class CheckLogic {
             String password = req.getString("password");
             String cmd = getCheckCommand("wget");
             RemoteShellUtil remoteShellUtil = new RemoteShellUtil(ip, username, password);
-            errorMsg += remoteShellUtil.exec(cmd);
+            errorMsg += logger.websocket( remoteShellUtil.exec(cmd) );
         }
         if( !StringUtils.isBlank( errorMsg ) ){
+            logger.websocket( errorMsg );
             return Response.Error( errorMsg );
         }
         return  Response.Success();
@@ -143,10 +145,11 @@ public class CheckLogic {
             String password = req.getString("password");
             boolean res = NetUtil.checkIpAnduserAccess(ip, username, password);
             if( !res ){
-                errorMsg += username + " user is not permisson <br/>";
+                errorMsg += logger.websocket( username + " user is not permisson <br/>" );
             }
         }
         if( !StringUtils.isBlank( errorMsg ) ){
+            logger.websocket( errorMsg );
             return Response.Error( errorMsg );
         }
         return  Response.Success();

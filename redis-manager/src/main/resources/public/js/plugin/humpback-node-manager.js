@@ -1,6 +1,5 @@
 $(document).ready(function(){
     window.clusterId = getQueryString("clusterId");
-    /*
     getCluster(clusterId, function(obj){
         var cluster = obj.res;
         console.log(cluster)
@@ -10,7 +9,6 @@ $(document).ready(function(){
             rebuildHumpbackNodeListTable( clusterId );
         });
     });
-     */
 });
 
 function rebuildHumpbackNodeListTable(){

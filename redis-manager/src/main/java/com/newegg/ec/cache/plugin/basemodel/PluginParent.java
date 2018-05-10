@@ -2,15 +2,19 @@ package com.newegg.ec.cache.plugin.basemodel;
 
 import com.newegg.ec.cache.app.component.RedisManager;
 import com.newegg.ec.cache.app.logic.ClusterLogic;
+import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by gl49 on 2018/5/9.
@@ -18,7 +22,7 @@ import java.util.Map;
 @Component
 public abstract class PluginParent {
     public static final String IPLIST_NAME = "iplist";
-    public static final String IMAGE_URL = "imageUrl";
+    public static final String IMAGE = "image";
     @Resource
     protected ClusterLogic clusterLogic;
 
@@ -59,7 +63,32 @@ public abstract class PluginParent {
 
     protected abstract void installNodeList(JSONObject reqParam, List<RedisNode> nodelist);
 
-    protected abstract int addCluster(JSONObject reqParam);
+    /**
+     * table cluster 写入数据
+     * @param reqParam
+     * @return 返回-1 写入数据失败
+     */
+    protected  int addCluster(JSONObject reqParam){
+        int clusterId = -1;
+        String ipListStr = reqParam.getString(IPLIST_NAME);
+        List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
+        RedisNode node = new RedisNode();
+        for(RedisNode redisNode : nodelist){
+            if(NetUtil.checkIpAndPort(redisNode.getIp(),redisNode.getPort())){
+                node = redisNode;
+                break;
+            }
+        }
+        if(StringUtils.isNotEmpty(node.getIp())){
+            Cluster cluster = new Cluster();
+            cluster.setAddress(node.getIp() + ":" + node.getPort());
+            cluster.setUserGroup(reqParam.get("userGroup").toString());
+            cluster.setClusterType(reqParam.get("pluginType").toString());
+            cluster.setClusterName(reqParam.get("clusterName").toString());
+            clusterId = clusterLogic.addCluster( cluster );
+        }
+        return clusterId;
+    }
 
     protected void buildRedisCluster(Map<RedisNode, List<RedisNode>> ipMap){
         redisManager.buildCluster( ipMap );

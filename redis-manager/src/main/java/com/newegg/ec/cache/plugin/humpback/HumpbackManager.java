@@ -37,7 +37,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
 
     static ExecutorService executorService = Executors.newFixedThreadPool(100);
     @Value("${cache.humpback.image}")
-    private String humpbackImage;
+    private String images;
     @Value("${cache.humpback.api.format}")
     private String humpbackApiFormat;
 
@@ -61,7 +61,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
         boolean res = true;
         String ipStr = pullParam.getString( PluginParent.IPLIST_NAME );
         Set<String> ipSet = JedisUtil.getIPList(ipStr);
-        String imageUrl = pullParam.getString( PluginParent.IMAGE_URL );
+        String imageUrl = pullParam.getString( PluginParent.IMAGE );
         logger.websocket("start pull image ");
         List<Future<String>> futureList = new ArrayList<>();
         for(String ip : ipSet){
@@ -158,8 +158,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     public List<String> getImageList() {
         User user  = RequestUtil.getUser();
-        System.out.println(user);
-        return Lists.newArrayList(humpbackImage.split(","));
+        return Lists.newArrayList( images.split(",") );
     }
 
     /**
@@ -194,7 +193,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      */
     @Override
     protected void installNodeList(JSONObject reqParam, List<RedisNode> nodelist) {
-        String image = reqParam.getString("imageUrl");
+        String image = reqParam.getString( PluginParent.IMAGE );
         String containerName = reqParam.getString("containerName");
         List<Future<Boolean>> futureList = new ArrayList<>();
         nodelist.forEach(node -> {
@@ -245,34 +244,6 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     }
 
     /**
-     * table cluster 写入数据
-     * @param reqParam
-     * @return 返回-1 写入数据失败
-     */
-    @Override
-    protected int addCluster(JSONObject reqParam) {
-        int clusterId = -1;
-        String ipListStr = reqParam.getString(IPLIST_NAME);
-        List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
-        RedisNode node = new RedisNode();
-        for(RedisNode redisNode : nodelist){
-            if(NetUtil.checkIpAndPort(redisNode.getIp(),redisNode.getPort())){
-                node = redisNode;
-                break;
-            }
-        }
-        if(StringUtils.isNotEmpty(node.getIp())){
-            Cluster cluster = new Cluster();
-            cluster.setAddress(node.getIp() + ":" + node.getPort());
-            cluster.setUserGroup(reqParam.get("userGroup").toString());
-            cluster.setClusterType(reqParam.get("pluginType").toString());
-            cluster.setClusterName(reqParam.get("clusterName").toString());
-            clusterId = clusterLogic.addCluster( cluster );
-        }
-        return clusterId;
-    }
-
-    /**
      * table humpback_node 写入数据
      * @param reqParam
      * @param clusterId
@@ -280,19 +251,19 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     protected void addNodeList(JSONObject reqParam, int clusterId) {
         String ipListStr = reqParam.getString(IPLIST_NAME);
-        String image = reqParam.getString(IMAGE_URL);
+        String image = reqParam.getString(  PluginParent.IMAGE );
         String containerName = reqParam.getString("containerName");
         List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
-        for(RedisNode node : nodelist){
-            HumpbackNode humpbackNode = new HumpbackNode();
-            humpbackNode.setClusterId(clusterId);
-            humpbackNode.setContainerName( containerName + node.getPort());
-            humpbackNode.setUserGroup(reqParam.get("userGroup").toString());
-            humpbackNode.setImage(image);
-            humpbackNode.setIp(node.getIp());
-            humpbackNode.setPort(node.getPort());
-            humpbackNode.setAddTime(DateUtil.getTime());
-            humpbackNodeDao.addHumbackNode(humpbackNode);
+        for(RedisNode redisNode : nodelist){
+            HumpbackNode node = new HumpbackNode();
+            node.setClusterId(clusterId);
+            node.setContainerName( containerName + redisNode.getPort());
+            node.setUserGroup(reqParam.get("userGroup").toString());
+            node.setImage(image);
+            node.setIp(node.getIp());
+            node.setPort(node.getPort());
+            node.setAddTime(DateUtil.getTime());
+            humpbackNodeDao.addHumbackNode(node);
         }
     }
 

@@ -44,8 +44,6 @@ public class MachineNodeDaoTest {
         machineNode.setUserGroup("admin");
         machineNode.setIp("10.16.46.172");
         machineNode.setPort(8008);
-        machineNode.setStartCommand("./start.sh");
-        machineNode.setStopCommand("./stop.sh");
         machineNode.setInstallPath("/opt/app/redis");
         System.out.println(machineNodeDao.addMachineNode(machineNode));
     }
