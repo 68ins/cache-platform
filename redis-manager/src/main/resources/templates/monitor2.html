@@ -33,7 +33,8 @@
     <style type="text/css">
         .chart-sm{
             height: 200px;
-            width: 400px
+            width: 400px;
+            margin-top 20px;
         }
     </style>
 </head>
@@ -113,12 +114,12 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="panel panel-default my-panel">
-                        <div class="panel-heading">
+                        <div class="panel-heading" style="font-size: 18px;">
                             <div>
                                 <span class="label-success cluster-info">Cluster Healthy</span>
                                 Cluster nodes: <b class="label-success">2</b> | Master Size: <b class="label-success">1</b>
                             </div>
-                            <div class="panel-heading-right">
+                            <div class="panel-heading-right" style="display:none">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                         Command <span class="caret"></span>
@@ -135,21 +136,22 @@
 
                         </div>
                         <div class="base-info-list">
-                            <ul>
+                            <ul style="padding:10px">
                                 <li>
                                     <span class="info-container">
                                         <span class="glyphicon glyphicon-hourglass info"></span>
                                         <span class="title"> 响应时间 : <span id="avg-response">1</span>/ms</span>
                                     </span>
-                                    <div class="panel-body" id="top-response-time">
+                                    <div  id="top-response-time" style="font-size: 20px;">
                                     </div>
                                 </li>
                                 <li>
                                     <span class="info-container">
                                         <span class="glyphicon glyphicon-piggy-bank info"></span>
                                         <span class="title"> key总数 : <span id="all-key">931001</span></span>
+
                                     </span>
-                                    <div class="panel-body" id="top-connection">
+                                    <div id="top-connection" style="font-size: 20px;">
                                         <p class="top-item">Max: <span class="top_request_monitor" id="max-all-key">931026</span>
                                         </p>
                                         <p class="top-item">Min: <span class="top_request_monitor" id="min-all-key">930976</span>
@@ -161,7 +163,7 @@
                                         <span class="glyphicon glyphicon-transfer info"></span>
                                         <span class="title"> 连接数 : <span id="avg-connection">147</span></span>
                                     </span>
-                                    <div class="panel-body" id="top-avg-connection">
+                                    <div  id="top-avg-connection" style="font-size: 20px;">
                                     </div>
                                 </li>
                                 <li>
@@ -169,7 +171,7 @@
                                         <span class="glyphicon glyphicon-transfer info"></span>
                                         <span class="title"> 每秒操作数 : <span id="avg-instantaneous">147</span></span>
                                     </span>
-                                    <div class="panel-body" id="top-avg-instantaneous">
+                                    <div  id="top-avg-instantaneous" style="font-size: 20px;">
                                     </div>
                                 </li>
                             </ul>
@@ -179,8 +181,8 @@
 
                 <div class="row">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Info Detail</h3>
+                        <div class="panel-heading" style="font-size:18px">
+                            Detail Charts
                         </div>
 
                         <div class="panel-body" style="overflow: auto; display:none ">
@@ -233,18 +235,23 @@
                             </table>
                         </div><!-- .panel-body -->
 
-                        <div id="charts-cpu" class="col-md-4 chart-sm" >
+                        <div class="panel-body" >
+                            <div id="charts-cpu" class="col-md-4 chart-sm" >
+                            </div>
+                            <div id="charts-memory" class="col-md-4 chart-sm" >
+                            </div>
+                            <div id="charts-client" class="col-md-4 chart-sm" >
+                            </div>
+                            <div id="charts-ops" class="col-md-4 chart-sm" >
+                            </div>
+                            <div id="charts-commands" class="col-md-4 chart-sm" >
+                            </div>
+                            <div id="charts-expireKeys" class="col-md-4 chart-sm" >
+                            </div>
+                            <div id="charts-hitRate" class="col-md-4 chart-sm" >
+                            </div>
                         </div>
-                        <div id="charts-memory" class="col-md-4 chart-sm" >
-
-                        </div>
-                        <div id="charts-client" class="col-md-4 chart-sm" >
-
-                        </div>
-                        <div id="charts-commands" class="col-md-4 chart-sm" >
-
-                        </div>
-                        <div class="panel-body log-table-wrapper scrollbar-div scrollbar-div-1" >
+                        <div class="panel-body  scrollbar-div scrollbar-div-1" >
                             <div class="slow-log-container">
                                 <select id="logNodeList" class="selectpicker show-tick form-control" title="Slow Log" data-live-search="true" data-width="250px">
                                 </select>
