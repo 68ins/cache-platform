@@ -488,13 +488,15 @@ function input_box_blur()
 				show_tip_msg( tip_box, tip_box_type, 'checking ...', info_css );
 			}
 			function ajax_check (  re, arg ){
-                arg.data( 'checking', 0 );
-                reset_tip_box( tip_box, tip_box_type );
-                if ( re.code > 0 ){
-                    url_check = false;
-                    url_check_msg = re.msg;
-                }
-                show_check_result();
+				if( url_check == true ){
+					arg.data( 'checking', 0 );
+					reset_tip_box( tip_box, tip_box_type );
+					if ( re.code > 0 ){
+						url_check = false;
+						url_check_msg = re.msg;
+					}
+					show_check_result();
+				}
 			};
 			var urlarr = urlstr.split(",");
 			urlarr.forEach(function(url){
