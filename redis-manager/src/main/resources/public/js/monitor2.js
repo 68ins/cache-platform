@@ -7,14 +7,12 @@ $(document).ready(function(){
     window.host = getQueryString("host") || "all";
     window.date = getQueryString("date") || "minute";
     window.type = getQueryString("type") || "max";
-    window.address = ""
+    window.address = "";
     getCluster(window.clusterId , function(obj){
         window.address = obj.res.address;
         console.log(window.address);
         init();
     })
-//    $('th[data-field="responseTime"]').trigger("click");
-    // init time selector
     $(".start-time").flatpickr();
     $(".end-time").flatpickr();
     $(".start-time").val(timestampToDate(window.startTime));
@@ -146,7 +144,7 @@ smarty.register_function( 'format_redis_result', function( params ){
 });
 
 function reloadMonitor(){
-    window.location.href = "/monitor/manager?clusterId="+window.clusterId +"&startTime=" + window.startTime + "&endTime="+window.endTime + "&host=" + window.host + "&type=" + window.type + "&date=" + window.date;
+    window.location.href = "/monitor/clusterMonitor?clusterId="+window.clusterId +"&startTime=" + window.startTime + "&endTime="+window.endTime + "&host=" + window.host + "&type=" + window.type + "&date=" + window.date;
 }
 
 function init(){
@@ -199,11 +197,15 @@ function init(){
     });
 
     monitorGetGroupNodeInfo(window.clusterId ,window.startTime,window.endTime,window.host,window.type,window.date,function(obj){
-        buildChart("charts-cpu","CPU累计使用时间","date","usedCpuUser",obj.res,"CPU usage","数值（单位）");
-        buildChart("charts-memory","内存占用 （kb）","date","usedMemory",obj.res,"memory usage","数值（单位）");
-        buildChart("charts-client","客户端连接数","date","connectedClients",obj.res,"client connections","数值（单位）");
-        buildChart("charts-commands","每秒输出字节量 ","date","instantaneousOutputKbps",obj.res,"command bytes /sec","数值（单位）");
-
+        var storageUnit = calculationStorageUnit(obj.res[0].usedMemory);
+        var usefulData = refactor(obj.res,window.date,storageUnit);
+        buildChart("charts-cpu","CPU占用率","date","usedCpuUser",obj.res,"CPU usage"," %/s");
+        buildChart("charts-memory","内存占用","date","usedMemory",obj.res,"memory usage", storageUnit);
+        buildChart("charts-client","客户端连接数","date","connectedClients",obj.res,"client connections"," ");
+        buildChart("charts-ops","每秒执行指令数 ","date","instantaneousOpsPerSec",obj.res,"command  /sec"," ");
+        buildChart("charts-commands","每秒实际命令数","date","totalCommandsProcessed",obj.res,"command  /sec  "," ");
+        buildChart("charts-expireKeys","过期键值量（时间段）","date","expiresRecently",obj.res,"expires_recently_total"," ");
+        buildChart("charts-hitRate","命中率","date","keyspaceHitRate",obj.res,"hitRate_avg"," ");
     });
 
     getCluster(window.clusterId , function(obj){
@@ -211,9 +213,9 @@ function init(){
     });
 
     // set node options
-    var address = window.address
+    var address = window.address;
     nodeList(address, function(nodeObj){
-        var nodeList = nodeObj.res
+        var nodeList = nodeObj.res;
         window.nodeList = nodeList;
         var options = '<option>all</option>';
         for(var i = 0, len = nodeList.length; i < len; i++){
@@ -222,7 +224,7 @@ function init(){
             var role = node.role;
             options += '<option data-subtext="'+role+'">'+host+'</option>';
         }
-        var nodeListObj = $("#nodeList")
+        var nodeListObj = $("#nodeList");
         nodeListObj.append(options);
         nodeListObj.val(window.host);
         nodeListObj.selectpicker("refresh");
@@ -230,10 +232,104 @@ function init(){
         logNodeListObj.append(options);
         logNodeListObj.selectpicker("refresh");
     });
+}
+
+function  calculationStorageUnit(numberValue){
+    var sizeUnit = '';
+    if( numberValue < 1024 ){
+        sizeUnit = 'B';
+    }else if( numberValue /1024 <1024 ){
+        sizeUnit = 'KB';
+    }else if( numberValue /1024/1024 <1024 ){
+        sizeUnit = 'MB';
+    }else{
+        sizeUnit = 'GB';
+    }
+    return sizeUnit;
+}
 
 
+function refactor(originData,timeUnit,storageUnit){
+    var maxIndex = originData.length;
+    for(var index=maxIndex-1;index>0;index--){
+        var thisRecord = originData[index];
+        var fontRecord = originData[index-1];
+
+        // 做差值 获得有用的 统计值
+        thisRecord.totalConnectionsReceived = (thisRecord.totalConnectionsReceived - fontRecord.totalConnectionsReceived).toFixed(2);
+        thisRecord.totalCommandsProcessed = (thisRecord.totalCommandsProcessed - fontRecord.totalCommandsProcessed).toFixed(2);
+        thisRecord.totalNetInputBytes = (thisRecord.totalNetInputBytes - fontRecord.totalNetInputBytes).toFixed(2);
+        thisRecord.totalNetOutputBytes = (thisRecord.totalNetOutputBytes - fontRecord.totalNetOutputBytes).toFixed(2);
+        thisRecord.keyspaceHits = (thisRecord.keyspaceHits - fontRecord.keyspaceHits).toFixed(2);
+        thisRecord.keyspaceMisses = (thisRecord.keyspaceMisses - fontRecord.keyspaceMisses).toFixed(2);
+        thisRecord.usedCpuSys = (thisRecord.usedCpuSys - fontRecord.usedCpuSys).toFixed(2);
+        thisRecord.usedCpuUser = (thisRecord.usedCpuUser - fontRecord.usedCpuUser).toFixed(2);
+        thisRecord.usedCpuSysChildren = (thisRecord.usedCpuSysChildren - fontRecord.usedCpuSysChildren).toFixed(2);
+        thisRecord.usedCpuUserChildren = (thisRecord.usedCpuUserChildren - fontRecord.usedCpuUserChildren).toFixed(2);
+        thisRecord.expiresRecently = (thisRecord.expires - fontRecord.expires).toFixed(2);
+
+        // 时间单位换算 获得有用的 统计值
+        if(timeUnit == 'minute'){
+            thisRecord.totalCommandsProcessed = ( thisRecord.totalCommandsProcessed /60 ).toFixed(2);
+            thisRecord.usedCpuUser = ( thisRecord.usedCpuUser /60 ).toFixed(4);
+        }else if(timeUnit == 'hour'){
+            thisRecord.totalCommandsProcessed = ( thisRecord.totalCommandsProcessed /60 /60 ).toFixed(2);
+            thisRecord.usedCpuUser = ( thisRecord.usedCpuUser /60/60 ).toFixed(4);
+        }else if(timeUnit == 'day'){
+            thisRecord.totalCommandsProcessed = ( thisRecord.totalCommandsProcessed /60 /60 /24 ).toFixed(2);
+            thisRecord.usedCpuUser = ( thisRecord.usedCpuUser /60/60/24 ).toFixed(4);
+        }
+
+        // 计算 获得有用的 统计值
+        thisRecord.keyspaceHitRate = (thisRecord.keyspaceHits/(parseInt(thisRecord.keyspaceHits) + parseInt(thisRecord.keyspaceMisses))).toFixed(2);
+
+        // 存储单位换算 获得有用的 统计值
+        if (storageUnit == 'KB'){
+            thisRecord.usedMemory = (thisRecord.usedMemory/1024).toFixed(2);
+            thisRecord.usedMemoryRss = (thisRecord.usedMemoryRss/1024).toFixed(2);
+            thisRecord.usedMemoryPeak = (thisRecord.usedMemoryPeak/1024).toFixed(2);
+        }else if (storageUnit == 'MB'){
+            thisRecord.usedMemory = (thisRecord.usedMemory /1024/1024).toFixed(2);
+            thisRecord.usedMemoryRss = (thisRecord.usedMemoryRss/1024/1024).toFixed(2);
+            thisRecord.usedMemoryPeak = (thisRecord.usedMemoryPeak/1024/1024).toFixed(2);
+        }else if (storageUnit == 'GB'){
+            thisRecord.usedMemory = (thisRecord.usedMemory/1024/1024/1024).toFixed(2);
+            thisRecord.usedMemoryRss = (thisRecord.usedMemoryRss/1024/1024/1024).toFixed(2);
+            thisRecord.usedMemoryPeak = (thisRecord.usedMemoryPeak/1024/1024/1024).toFixed(2);
+        }else {
+
+        }
+
+        var dateStr_hhh = thisRecord.date.toString();
+        // 时间字符串转化
+        var splitIndex_date = dateStr_hhh.indexOf(":");
+        if(splitIndex_date != -1){
+            var str1 = dateStr_hhh.substring(0,splitIndex_date);
+            var str2 = dateStr_hhh.substring(splitIndex_date+1,dateStr_hhh.length);
+            if(str1.length  == 8 ){  //20180505:5
+                if(str2.length  == 1 ){
+                    str2 = '0'+str2;
+                }
+                dateStr_hhh = str1.substring(4,5)+'/'+str1.substring(6,7) + ' ' + str2 +':00';
+            }else {
+                if(str1.length ==1){
+                    str1 = '0'+str1;
+                }
+                if(str2.length ==1){
+                    str2 = '0'+str2;
+                }
+                dateStr_hhh = str1+':'+str2;
+            }
+            thisRecord.date = dateStr_hhh;
+        }
+
+    }
+    originData.shift();
+    console.log(originData);
+    return originData;
 
 }
+
 
 function buildChart(webElementId,titleText,xAxisFieldName,yAxisFieldName,chartData,legendText,yAxisText){
     var myChart = echarts.init(document.getElementById(webElementId));
@@ -259,8 +355,9 @@ function buildChart(webElementId,titleText,xAxisFieldName,yAxisFieldName,chartDa
             name: yAxisText,
             offset: '0',
             position: 'left',
+            scale: true,
             nameTextStyle: {
-                fontSize: 8,
+                fontSize: 12,
                 align:'right'
             }
         },
@@ -280,6 +377,7 @@ function buildChart(webElementId,titleText,xAxisFieldName,yAxisFieldName,chartDa
         legend:{
             show: true,
             top: 'bottom',
+            selectedMode: false,
             formatter: function(name){
                 return legendText;
             }
@@ -298,20 +396,6 @@ function buildChart(webElementId,titleText,xAxisFieldName,yAxisFieldName,chartDa
 }
 
 
-$("#field-title > th").click(function () {
-    var field = $(this).data("field");
-    if( field != "date" ){
-        $("#field-title > th").removeClass("selected");
-        $(this).addClass("selected");
-        ajax.async_get("/monitor/getGroupNodeInfo?clusterId=" + window.clusterId  + "&startTime="+ window.startTime +"&endTime=" + window.endTime + "&host=" + window.host + "&type=" + window.type + "&date=" + window.date, function(obj){
-            makeCharts("light", "#FFFFFF", field, obj.res);
-            console.log(obj.res)
-            smarty.html( "monitor/node_info_table", obj, "node-info-table",function () {
-                console.log("html ...");
-            });
-        });
-    }
-});
 
 // slow log
 $("#logNodeList").on('changed.bs.select', function (e) {
