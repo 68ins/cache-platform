@@ -98,6 +98,13 @@
 .no-border-input{
 
 }
+.plugin-install-title{
+    margin-left: 15px;
+    font-size: 30px;
+}
+.create-cluster-button{
+    margin-left:-8px;
+}
  .sparrow_input_tip_error, .sparrow_input_tip_info, .sparrow_input_tip_ok{
     padding-left: 28px;
     line-height: 15px;
@@ -105,3 +112,6 @@
     background-position: 0px;
 }
 
+.manager-create-iframe{
+    margin-top:-20px;
+}

@@ -163,7 +163,6 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      */
     @Override
     public List<String> getImageList() {
-        User user  = RequestUtil.getUser();
         return Lists.newArrayList( images.split(",") );
     }
 

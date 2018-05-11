@@ -29,7 +29,7 @@ public class DockerOptionTest {
     public void testcreateContainer() {
         JSONObject reqObject = new JSONObject();
         reqObject.put("image", "redis3.0.6");
-        reqObject.put("container_name", "leoredistest");
+        reqObject.put("container_name", "leoredistest1");
         reqObject.put("container_volume", "/data/redis");
         reqObject.put("machine_volume", "/data/redis");
         reqObject.put("network_mode", "host");

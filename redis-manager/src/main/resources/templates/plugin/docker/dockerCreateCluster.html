@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.springframework.org/schema/mvc">
 <head>
     <meta charset="UTF-8" />
     <title>Title</title>
@@ -8,19 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" href="../css/common.css"/>
-    <link rel="stylesheet" href="../vender/sparrow/sparrow.css"/>
-    <link href="../vender/smart_wizard/css/smart_wizard.css" rel="stylesheet" type="text/css" />
-    <link href="../vender/smart_wizard/css/smart_wizard_theme_arrows.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="../vender/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="../css/plugin/node.css"/>
+    <link href="../vender/sparrow/sparrow.css" rel="stylesheet" charset="utf-8" />
+    <script type="text/javascript" src="../vender/jquery/jquery-3.3.1.min.js"></script>
     <script type="text/javascript" src="../vender/bootstrap-3.3.7/js/bootstrap.js"></script>
-
-    <script src="../vender/smart_wizard/js/jquery.smartWizard.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script src="../vender/sparrow/layer/layer.js"></script>
     <script src="../vender/sparrow/ajax.js"></script>
     <script src="../core/userApi.js"></script>
     <script src="../vender/sparrow/util.js"></script>
     <script src="../vender/sparrow/smarty.js"></script>
     <script src="../vender/sparrow/validate.js"></script>
+    <script src="../core/websocket.js"></script>
     <script src="../js/common.js"></script>
     <script src="../vender/autosize.js"></script>
     <style>
@@ -29,10 +29,16 @@
 </head>
 <body>
 <div class="container-fluid">
-    <div id="create-cluster-container" style="height: 600px">
+    <h1 class="plugin-install-title">docker install</h1>
+    <div id="create-cluster-container">
 
     </div>
 </div><!-- .container-fluid -->
 </body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+        window.user = /*[[${user}]]*/;
+    /*]]>*/
+</script>
 <script src="../js/plugin/docker-create-cluster.js"></script>
 </html>

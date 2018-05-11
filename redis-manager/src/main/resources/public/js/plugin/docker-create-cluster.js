@@ -1,40 +1,58 @@
-smarty.html( "node/docker/create_cluster_step", {}, "create-cluster-container",function () {
-    // Smart Wizard events
-    $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
-        console.log( stepNumber + "----------" +stepDirection);
-        return true;
-    });
-    // Step show event
-    $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
-       //alert("You are on step "+stepNumber+" now");
-       if(stepPosition === 'first'){
-           $(".prev-btn").addClass('disabled');
-       }else if(stepPosition === 'final'){
-           $(".next-btn").addClass('disabled');
-       }else{
-           $(".prev-btn").removeClass('disabled');
-           $(".next-btn").removeClass('disabled');
-       }
-    });
-
-    // Smart Wizard
-    $('#smartwizard').smartWizard({
-            selected: 0,
-            theme: 'arrows',
-            transitionEffect:'fade',
-            showStepURLhash: true,
-            toolbarSettings: {}
-    });
-
-    $(".prev-btn").on("click", function() {
-        // Navigate previous
-        $('#smartwizard').smartWizard("prev");
-        return true;
-    });
-
-    $(".next-btn").on("click", function() {
-        // Navigate next
-        $('#smartwizard').smartWizard("next");
-        return true;
-    });
+$(document).ready(function(){
+    window.pluginType = "docker";
+    window.clusterId = getQueryString("clusterId");
+    init_install_ui(window.clusterId);
 });
+
+function init_install_ui(clusterId){
+    getImageList(window.pluginType, function(obj){
+        console.log( obj );
+        var userGroup = window.user.userGroup || "";
+        var groupList = [];
+        if( userGroup != "" ){
+            groupList = userGroup.split(",");
+        }
+        obj.groups = groupList;
+        createClusterStep( obj, clusterId );
+    });
+}
+
+$(document).on("click", "#start-install-cluster", function(obj){
+    var installParam = sparrow_form.encode( "create-cluster-form", 1 );
+    if ( !sparrow.empty( installParam )  ){
+        installParam.pluginType = window.pluginType;
+        if( clusterId ){
+            installParam.clusterId = clusterId;
+        }
+        var param = {
+            "pluginType": window.pluginType,
+            "req": installParam
+        }
+        console.log( param );
+        nodePullImage( param, function(obj){
+            if( obj.code ==  0 ){
+                nodeInstall( param, function(obj){
+                    console.log( obj.res );
+                });
+            }
+        });
+    }
+});
+
+function  createClusterStep( data, clusterId){
+    smarty.html( "plugin/" + window.pluginType + "/create_cluster_step", data, "create-cluster-container",function () {
+        if( clusterId ){
+            // 如果有传入 clusterId 需要重绘界面
+            getCluster(clusterId, function (obj) {
+                var cluster = obj.res;
+                $("[name='clusterName']").val( cluster.clusterName );
+                $("[name='clusterName']").attr("disabled","disabled");
+                console.log( cluster );
+            });
+        }
+        autosize(document.querySelectorAll('textarea'));
+        var data = {};
+        data.id = window.user.id;
+        connect( JSON.stringify(data), "/webSocket/createClusterLog");
+    });
+}

@@ -11,6 +11,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -28,16 +29,11 @@ public class DockerManager implements INodeOperate,INodeRequest {
     private static final String DOCKER_REPOSITORY_PORT = "5000";
     private static final String DOCKER_RESTFUL_PORT = "2375";
     private static final String DOCKER_REPOSITORY_URL = PROTOCOL + DOCKER_REPOSITORY_HOST + ":" + DOCKER_REPOSITORY_PORT;
-
-
-    private int userId;
-    private String dockerImage;
+    @Value("${cache.docker.image}")
+    private String images;
 
     public DockerManager(){
         //ignore
-    }
-    public DockerManager(int userId){
-        this.userId = userId;
     }
 
     @Autowired
@@ -76,7 +72,7 @@ public class DockerManager implements INodeOperate,INodeRequest {
 
     @Override
     public List<String> getImageList() {
-        return Lists.newArrayList(dockerImage.split(","));
+        return Lists.newArrayList( images.split(",") );
     }
 
     @Override
@@ -130,7 +126,9 @@ public class DockerManager implements INodeOperate,INodeRequest {
         try {
             //镜像会先拉去到指定的机器上
             String containerName = param.getString("container_name");
-            JSONObject dockerResult = JSONObject.fromObject(HttpClientUtil.getPostResponse(getContainerApi(ip) + "create", installObject));
+            String postUrl = getContainerApi(ip) + "create";
+            String responseStr = HttpClientUtil.getPostResponse( postUrl, installObject );
+            JSONObject dockerResult = JSONObject.fromObject( responseStr );
             String container_id = dockerResult.getString("Id");
             System.out.println( dockerResult );
             optionContainer(ip,container_id,StartType.start);

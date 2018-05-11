@@ -131,11 +131,19 @@ public class ClusterLogic {
     }
 
     public boolean getClusterState(int id){
-        Host host = getClusterHost(id);
-        final Map<String, String> clusterInfo = getClusterInfo(host.getIp(), host.getPort());
-        System.out.println(clusterInfo);
-        String state = clusterInfo.get(Common.CLUSTER_STATE);
-        return  "ok".equals(state);
+        boolean res = false;
+        try {
+            Host host = getClusterHost(id);
+            final Map<String, String> clusterInfo = getClusterInfo(host.getIp(), host.getPort());
+            System.out.println(clusterInfo);
+            String state = clusterInfo.get(Common.CLUSTER_STATE);
+            if( "ok".equals(state) ){
+                res = true;
+            }
+        }catch (Exception ignore){
+            // ignore
+        }
+        return  res;
     }
 
     public Map<String,Map> detailNodeList(String address) {
