@@ -376,8 +376,6 @@ public class JedisUtil {
         List<Slowlog> list = new ArrayList((int)size);
         try {
             list = jedis.slowlogGet(size);
-        }catch ( Exception e ){
-            e.printStackTrace();
         }finally {
             jedis.close();
         }

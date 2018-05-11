@@ -100,8 +100,12 @@ public class RedisInfoChecker {
             List<ClusterCheckRule> ruleList = checkRuleDao.getClusterRuleList(cluster_id+"");
 
             //获取每个cluster所有的node
-            List<Map<String, String>> nodeList = JedisUtil.nodeList(ip, port);
-
+            List<Map<String, String>> nodeList = null;
+            try {
+                 nodeList = JedisUtil.nodeList(ip, port);
+            }catch(Exception e){
+                logger.error("Node " + host + " can not get nodelist");
+            }
             for(ClusterCheckRule rule : ruleList){
                 String formula = rule.getFormula();
                 for(Map<String, String> node : nodeList){
@@ -152,22 +156,27 @@ public class RedisInfoChecker {
             String host = cluster.getAddress().split(",")[0];
             String ip = host.split(":")[0];
             int port = Integer.parseInt(host.split(":")[1]);
-            List<Slowlog> list = JedisUtil.getSlowLog(ip,port,2000);
-            for(Slowlog slowlog : list){
-                if(slowlog.getTimeStamp() > time){
-                    num ++ ;
+            try{
+                List<Slowlog> list = JedisUtil.getSlowLog(ip,port,2000);
+                for(Slowlog slowlog : list){
+                    if(slowlog.getTimeStamp() > time){
+                        num ++ ;
+                    }
                 }
+                if(num >= 100){
+                    ClusterCheckLog log = new ClusterCheckLog();
+                    log.setId(CommonUtil.getUuid());
+                    log.setClusterId(cluster.getClusterName());
+                    log.setDescription("Redis slow logs warnning");
+                    log.setLogInfo("There are more than 100 slowlogs in last 1 hour on Cluster " + cluster.getClusterName());
+                    log.setLogType(ClusterCheckLog.LogType.slowlog);
+                    log.setUpdateTime(DateUtil.getTime());
+                    checkLogDao.addClusterCheckLog(log);
+                }
+            }catch(Exception e){
+                logger.error("Node " + host + " check slow log error");
             }
-            if(num >= 100){
-                ClusterCheckLog log = new ClusterCheckLog();
-                log.setId(CommonUtil.getUuid());
-                log.setClusterId(cluster.getClusterName());
-                log.setDescription("Redis slow logs warnning");
-                log.setLogInfo("There are more than 100 slowlogs in last 1 hour on Cluster " + cluster.getClusterName());
-                log.setLogType(ClusterCheckLog.LogType.slowlog);
-                log.setUpdateTime(DateUtil.getTime());
-                checkLogDao.addClusterCheckLog(log);
-            }
+
         }
     }
 
