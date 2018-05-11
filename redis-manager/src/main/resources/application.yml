@@ -29,8 +29,8 @@ cache:
         image: humpback-hub.newegg.org/shec/redis3.0.6:v3,docker.neg/shec/redis-4.0.8:v1
         api.format: http://%s:8500/dockerapi/v2/
     docker:
-            image: ssecbigdata02:5000/redis4.0.1
-            api.format: http://%s:8500/dockerapi/v2/
+            image: ssecbigdata02:5000/
+            api.format: http://%s:2375/
     machine:
         install:
             shell: /shell/redis_install.sh
