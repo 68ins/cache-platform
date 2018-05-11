@@ -1,8 +1,7 @@
-package com.newegg.ec.cache.plugin.machine;
+package com.newegg.ec.cache.plugin.docker;
 
 import com.newegg.ec.cache.Application;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
-import com.newegg.ec.cache.plugin.docker.DockerManager;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,19 +27,22 @@ public class DockerOptionTest {
     @Test
     public void testcreateContainer() {
         JSONObject reqObject = new JSONObject();
-        reqObject.put("image", "redis3.0.6");
-        reqObject.put("container_name", "leoredistest1");
+        reqObject.put("image", "ssecbigdata02:5000/redis4.0.1");
+        reqObject.put("container_name", "leoredistest");
         reqObject.put("container_volume", "/data/redis");
         reqObject.put("machine_volume", "/data/redis");
         reqObject.put("network_mode", "host");
         reqObject.put("restart_policy", "always");
-        reqObject.put("cmd", "10.16.46.170:8533");
+        reqObject.put("cmd", "/redis/redis-4.0.1/start.sh 7001 10.16.46.170");
         System.out.println(docker.createContainer("10.16.46.170", reqObject));
     }
     @Test
     public void optionContainer() {
-        System.out.println(docker.optionContainer("10.16.46.170", "412cb4b30228", StartType.start ));
+        System.out.println(docker.optionContainer("10.16.46.170", "leoredistest", StartType.stop));
     }
 
-
+    @Test
+    public void removeContainer() {
+        System.out.println(docker.deleteContainer("10.16.46.170", "leoredistest"));
+    }
 }

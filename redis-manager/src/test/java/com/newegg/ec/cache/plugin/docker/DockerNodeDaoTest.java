@@ -1,9 +1,7 @@
-package com.newegg.ec.cache.plugin.machine;
+package com.newegg.ec.cache.plugin.docker;
 
 import com.newegg.ec.cache.Application;
 import com.newegg.ec.cache.plugin.basemodel.Node;
-import com.newegg.ec.cache.plugin.docker.DockerNode;
-import com.newegg.ec.cache.plugin.docker.IDockerNodeDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

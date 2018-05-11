@@ -115,11 +115,9 @@ public class HttpClientUtil {
 
         try {
             response = httpclient.execute(httpPost);
-            if(response.getStatusLine().getStatusCode() == 200){
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    result =  EntityUtils.toString(entity);
-                }
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                result =  EntityUtils.toString(entity);
             }
         }finally {
             httpPost.releaseConnection();
@@ -136,7 +134,8 @@ public class HttpClientUtil {
     private static HttpPost postForm(String url,JSONObject jsonParam){
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader("Connection", "Keep-Alive");
-        httpPost.setHeader("Content-Type","application/json;charset=utf-8");
+        httpPost.setHeader("Content-Type","application/json");
+        httpPost.setHeader("Accept","application/json");
         try {
             StringEntity entity = new StringEntity(jsonParam.toString(),"utf-8");//解决中文乱码问题
             httpPost.setEntity(entity);
@@ -152,11 +151,9 @@ public class HttpClientUtil {
         HttpResponse response;
         try {
             response = httpclient.execute(httpGet);
-            if(response.getStatusLine().getStatusCode() == 200){
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    return EntityUtils.toString(entity);
-                }
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                return EntityUtils.toString(entity);
             }
 
         }finally {
@@ -177,7 +174,7 @@ public class HttpClientUtil {
         }
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader("Connection", "Keep-Alive");
-        httpGet.setHeader("Content-Type","application/json;charset=utf-8");
+        httpGet.setHeader("Content-Type","application/json");
         return httpGet;
     }
 
@@ -188,11 +185,9 @@ public class HttpClientUtil {
         String  result = null;
         try {
             response = httpclient.execute(httpPut);
-            if(response.getStatusLine().getStatusCode() == 200){
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    result = EntityUtils.toString(entity);
-                }
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                result = EntityUtils.toString(entity);
             }
 
         }finally {
@@ -209,7 +204,7 @@ public class HttpClientUtil {
     private static HttpPut putForm(String url,JSONObject jsonParam){
         HttpPut httpPut = new HttpPut(url);
         httpPut.setHeader("Connection", "Keep-Alive");
-        httpPut.setHeader("Content-Type","application/json;charset=utf-8");
+        httpPut.setHeader("Content-Type","application/json");
         try {
             StringEntity entity = new StringEntity(jsonParam.toString(),"utf-8");//解决中文乱码问题
             httpPut.setEntity(entity);
@@ -226,11 +221,9 @@ public class HttpClientUtil {
         String result = null;
         try {
             response = httpclient.execute(httpDelete);
-            if(response.getStatusLine().getStatusCode() == 200){
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    result =  EntityUtils.toString(entity);
-                }
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                result =  EntityUtils.toString(entity);
             }
 
         }finally {
@@ -246,7 +239,7 @@ public class HttpClientUtil {
         }
         HttpDelete httpDelete = new HttpDelete(url);
         httpDelete.setHeader("Connection", "Keep-Alive");
-        httpDelete.setHeader("Content-Type","application/json;charset=utf-8");
+        httpDelete.setHeader("Content-Type","application/json");
         return httpDelete;
     }
 
