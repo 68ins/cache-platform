@@ -5,7 +5,7 @@ $(document).ready(function(){
 });
 
 // query dbx
-$("#query-db").on("click", function(){
+$(document).on("click", "#query-db", function(){
     smarty.fopen( "/cluster/redisDbList?address="+window.address, "monitor/redis_query", true, { title: "Query", width:800, height:500},  function(obj){
         console.log(obj)
         var db = parseInt($(".db-list li").eq(0).find("a").attr("data-db"));
@@ -13,8 +13,7 @@ $("#query-db").on("click", function(){
         $(".db-dropdown").html('db' + db + '<span class="caret"></span>');
         query(db)
     } );
-})
-
+});
 
 $("body").delegate(".select-db", "click", function(){
     var db = parseInt($(this).attr("data-db"));

@@ -7,9 +7,11 @@ import com.newegg.ec.cache.app.model.*;
 import com.newegg.ec.cache.app.dao.impl.NodeInfoDao;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
+import com.newegg.ec.cache.core.logger.CommonLogger;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -22,6 +24,8 @@ import java.util.Map;
  */
 @Component
 public class ClusterLogic {
+    private static CommonLogger logger = new CommonLogger( ClusterLogic.class );
+
     @Autowired
     private IClusterDao clusterDao;
     @Autowired
@@ -171,11 +175,42 @@ public class ClusterLogic {
         return redisManager.beSlave(ip, port, masterId);
     }
 
-    public boolean beMaster(String ip, int port, String masterId) {
-        return redisManager.beMaster(ip, port, masterId);
+    public boolean beMaster(String ip, int port) {
+        return redisManager.beMaster(ip, port);
     }
 
     public boolean forgetNode(String ip, int port, String masterId) {
         return redisManager.forget(ip, port, masterId);
+    }
+
+    public boolean importNode(String ip, int port, String masterIP, int masterPort) {
+        return redisManager.clusterMeet(ip, port, masterIP, masterPort);
+    }
+
+    public boolean batchConfig(String myip, int myPort, String configName, String configValue) {
+        boolean res = true;
+        List<Map<String, String>> nodeList = JedisUtil.getNodeList(myip, myPort);
+        for(Map<String, String> node : nodeList){
+            String ip = node.get("ip");
+            int port = Integer.parseInt(node.get("port"));
+            Jedis jedis = new Jedis( ip, port);
+            try {
+                List<String> configList = jedis.configGet( configName );
+                if( configList.size() != 2 ){
+                    break;
+                }
+                String oldValue = configList.get(1).toString();
+                if( !oldValue.equals( configValue ) ){
+                    jedis.configSet(configName, configValue);
+                    jedis.clusterSaveConfig();
+                }
+            }catch (Exception e){
+                res = false;
+                logger.error("", e );
+            }finally {
+                jedis.close();
+            }
+        }
+        return res;
     }
 }

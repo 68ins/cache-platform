@@ -1,42 +1,44 @@
-<table id="humpbackNodeList" data-toggle="table" class="table table-hover table-bordered fixed-table-header"  >
+<table data-toggle="table" class="table table-hover table-bordered fixed-table-header"  >
     <thead>
     <tr >
-        <th  style="width:10px">#</th>
-        <th  class="display-hide">id</th>
-        <th  >Status</th>
-        <th  >InCluster</th>
-        <th  >Container Name</th>
-        <th  >Image Version</th>
-        <th  >Ip</th>
-        <th  >Port</th>
-        <th  >User Group</th>
-        <th  >AddTime</th>
-        <th  style="width:170px">Operation</th>
+        <th>Id</th>
+        <th>Status</th>
+        <th>InCluster</th>
+        <th>Container Name</th>
+        <th>Image Version</th>
+        <th>Ip</th>
+        <th>Port</th>
+        <th>User Group</th>
+        <th>AddTime</th>
+        <th>Operation</th>
     </tr>
     </thead>
     <tbody>
-    {{foreach from=$res item=humpback }}
-         <tr>
-             <td  style="width:10px"> </td>
-             <td  class="display-hide">{{$humpback.id}}</td>
-             <td id="status-{{$humpback.id}}">{{service_status  ip=$humpback.ip port=$humpback.port id=$humpback.id}}</td>
-             <td id="in-cluster-{{$humpback.id}}">{{in_cluster ip=$humpback.ip port=$humpback.port id=$humpback.id}}</td>
-             <td>{{$humpback.containerName}}</td>
-             <td>{{$humpback.image}}</td>
-             <td>{{$humpback.ip}}</td>
-             <td>{{$humpback.port}}</td>
-             <td>{{$humpback.userGroup}}</td>
-             <td>{{format_time time=$humpback.addTime}}</td>
+    {{foreach from=$res item=node }}
+         <tr id="node-{{$node.id}}" data-detail={{json_format node=$node}}>
+             <td>{{$node.id}}</td>
+             <td id="status-{{$node.id}}">{{service_status  ip=$node.ip port=$node.port id=$node.id}}</td>
+             <td id="in-cluster-{{$node.id}}">{{in_cluster ip=$node.ip port=$node.port id=$node.id}}</td>
+             <td>{{$node.containerName}}</td>
+             <td>{{$node.image}}</td>
+             <td>{{$node.ip}}</td>
+             <td>{{$node.port}}</td>
+             <td>{{$node.userGroup}}</td>
+             <td>{{format_time time=$node.addTime}}</td>
              <td>
-                 <a href="/node/delete?pluginType=humpback&containerName={{$humpback.containerName}}" class="option-container">
-                     <button class="btn btn-danger btn-sm " type="button">Delete</button>&nbsp
-                 </a>
-                 <a href="/node/stop?pluginType=humpback&containerName={{$humpback.containerName}}" class="option-container">
-                     <button class="btn btn-primary btn-sm" type="button">Stop</button>&nbsp
-                 </a>
-                 <a href="/node/start?pluginType=humpback&containerName={{$humpback.containerName}}" class="option-container">
-                     <button class="btn btn-primary btn-sm" type="button">Start</button>
-                 </a>
+                 <div class="btn-group btn-group-sm" role="group">
+                     <div class="btn-group btn-group-sm" role="group">
+                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Operate  <span class="caret"></span></button>
+                         <ul class="dropdown-menu">
+                             <li>
+                                 <a href="javascript:void(0)" data-id="{{$node.id}}" class="option-button delete-node">Delete</a>
+                                 <a href="javascript:void(0)" data-id="{{$node.id}}" class="option-button restart-node">Restart</a>
+                             </li>
+                         </ul>
+                     </div>
+                     <button data-id="{{$node.id}}" class="stop-node btn btn-default">Stop</button>
+                     <button class="option-button start-node btn btn-default" data-id="{{$node.id}}">Start</button>
+                 </div>
              </td>
          </tr>
      {{/foreach}}

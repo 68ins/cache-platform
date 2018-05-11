@@ -1,11 +1,24 @@
 
 <div class="panel panel-default">
-    <div class="panel-body" id="node-list-table" style="padding:0px">
+    <div class="pull-left" style="padding-top:15px;margin-left:10px">
+        <p>
+            {{cluster_status state=$res.clusterInfo.cluster_state}}
+            <a tabindex="0" style="color:#5bc0de" data-placement="bottom" class="detail-button" role="button" data-toggle="popover" data-trigger="focus" data-content="{{$res.clusterInfo}}"> [ detail ] </a>
+            cluster_known_nodes: <b class="success">{{$res.clusterInfo.cluster_known_nodes}}</b> | cluster_size: <b class="success">{{$res.clusterInfo.cluster_size}}</b>
+        </p>
+    </div>
+    <div class="panel-heading" style="height:50px">
+        <div class="pull-right"><button type="button" id="query-db" class="btn btn-info" style="margin-left:10px"><span class="glyphicon glyphicon-search"></span> Query</button></div>
+        <div class="pull-right pointer" style="margin-top:5px"><a id="import-node" style="margin-left:10px">[Import Node]</a></div>
+        <div class="pull-right pointer" style="margin-top:5px"><a id="batch-config" style="margin-left:10px">[Batch Config]</a></div>
+        {{if $res.clusterInfo.cluster_slots_assigned != "16384" }} <div class="pull-right pointer" style="margin-top:5px"><a id="init-cluster" data-trigger="focus" data-placement="left" data-toggle="popover" data-content="cluster bad status please init slot"  style="margin-left:10px">[Init Slot]</a></div>{{/if}}
+    </div>
+    <div class="panel-body" id="node-list-table" style="padding:0px;margin:-1px">
         <table class="table table-bordered" id="nodes-table">
             <thead>
             <tr>
                 <th style="width:100px">Expand <span class="glyphicon glyphicon-triangle-bottom pull-right pointer expand-all"></span></th>
-                <th style="width:200px">Status
+                <th style="width:140px">
                     <div class="pull-right">
                         <span class="badge status-type background-danger pointer table-title-span-button" data-type="fail" >bad ↑</span>
                         <span class="badge status-type background-success pointer table-title-span-button" data-type="ok">health ↑</span>
@@ -14,28 +27,28 @@
                 <th>Role</th>
                 <th>Host</th>
                 <th>Node</th>
-                <th>Slot
+                <th style="width:240px">Slot
                     <div class="pull-right">
                         <span class="badge slot-type background-danger pointer table-title-span-button" data-type="empty" >empty ↑</span>
                         <span class="badge slot-type pointer table-title-span-button" data-type="normal">normal ↑</span>
                         <span class="badge slot-type background-warning pointer table-title-span-button" data-type="warn">warn ↑</span>
                     </div>
                 </th>
-                <th>Options <a class="glyphicon glyphicon-refresh success pull-right" id="refresh-list"></a></th>
+                <th>Options</th>
             </tr>
             </thead>
             <tbody id="nodes-details">
             {{assign name="index" value=0}}
-            {{foreach from=$res item=clusterNodes}}
-            {{$index++}}
-            <tr {{cycle_color id=$index role=$clusterNodes.role}} class="master {{new_node_show slaveList=$clusterNodes.slaveList}}" data-index="{{$index}}">
-                {{include file="cluster/redis_list_master_row.html"}}
-            </tr>
-            {{foreach from=$clusterNodes.slaveList item=slave}}
-            <tr {{cycle_color id=$index role=$slave.role}} class="slave" data-index="{{$index}}">
-                {{include file="cluster/redis_list_slave_row.html"}}
-            </tr>
-            {{/foreach}}
+            {{foreach from=$res.nodeList item=clusterNodes}}
+                {{$index++}}
+                <tr {{cycle_color id=$index role=$clusterNodes.role}} class="master {{new_node_show slaveList=$clusterNodes.slaveList}}" data-index="{{$index}}">
+                    {{include file="cluster/redis_list_master_row.html"}}
+                </tr>
+                {{foreach from=$clusterNodes.slaveList item=slave}}
+                <tr {{cycle_color id=$index role=$slave.role}} class="slave" data-index="{{$index}}">
+                    {{include file="cluster/redis_list_slave_row.html"}}
+                </tr>
+                {{/foreach}}
             {{/foreach}}
             </tbody>
         </table>

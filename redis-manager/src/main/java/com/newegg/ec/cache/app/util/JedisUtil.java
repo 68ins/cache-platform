@@ -200,7 +200,7 @@ public class JedisUtil {
         return nodeList;
     }
 
-    private static List<Map<String, String>> getNodeList (String ip, int port) {
+    public static List<Map<String, String>> getNodeList(String ip, int port) {
         return getNodeList (ip, port, false);
     }
 

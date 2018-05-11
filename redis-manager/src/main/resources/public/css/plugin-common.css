@@ -115,3 +115,8 @@
 .manager-create-iframe{
     margin-top:-20px;
 }
+
+.dataTables_info,.dataTables_length,.dataTables_paginate,.dataTables_filter{
+   display:none;
+}
+

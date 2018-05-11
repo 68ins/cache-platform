@@ -6,14 +6,12 @@ import com.newegg.ec.cache.app.model.Response;
 import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.core.userapi.UserAccess;
 import com.newegg.ec.cache.plugin.INodeOperate;
-import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.Node;
 import com.newegg.ec.cache.plugin.basemodel.NodeRequestPram;
 import com.newegg.ec.cache.plugin.basemodel.PluginType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -24,7 +22,6 @@ import java.util.List;
 @RequestMapping("/node")
 @UserAccess
 public class NodeController {
-    private INodeRequest nodeRequest;
     private INodeOperate nodeOperate;
     @Resource
     private NodeManager nodeManager;
@@ -35,19 +32,15 @@ public class NodeController {
     }
 
     @RequestMapping("/install")
-    public String cluster(Model model, @RequestParam PluginType pluginType, @SessionAttribute(Common.SESSION_USER_KEY) User user) {
-        nodeRequest = nodeManager.factoryRequest(pluginType);
-        String template = nodeRequest.showInstall();
+    public String cluster(Model model,@SessionAttribute(Common.SESSION_USER_KEY) User user) {
         model.addAttribute("user", user);
-        return template;
+        return "installNode";
     }
 
     @RequestMapping("/manager")
-    public String manager(Model model, @RequestParam PluginType pluginType, @SessionAttribute(Common.SESSION_USER_KEY) User user) {
-        nodeRequest = nodeManager.factoryRequest(pluginType);
-        String template = nodeRequest.showManager();
+    public String manager(Model model, @SessionAttribute(Common.SESSION_USER_KEY) User user) {
         model.addAttribute("user", user);
-        return template;
+        return "nodeManager";
     }
 
     @RequestMapping(value = "/getImageList", method = RequestMethod.GET)
@@ -71,7 +64,10 @@ public class NodeController {
     public Response nodeStart(@RequestBody NodeRequestPram nodeRequestPram){
         nodeOperate = nodeManager.factoryOperate( nodeRequestPram.getPluginType() );
         boolean res = nodeOperate.start( nodeRequestPram.getReq() );
-        return Response.Result(Response.DEFAULT, res);
+        if( res  ){
+            return Response.Success();
+        }
+        return Response.Warn("start fail");
     }
 
     @RequestMapping(value = "/nodeStop", method = RequestMethod.POST)
@@ -79,7 +75,10 @@ public class NodeController {
     public Response nodeStop(@RequestBody NodeRequestPram nodeRequestPram){
         nodeOperate = nodeManager.factoryOperate( nodeRequestPram.getPluginType() );
         boolean res = nodeOperate.stop( nodeRequestPram.getReq() );
-        return Response.Result(Response.DEFAULT, res);
+        if( res  ){
+            return Response.Success();
+        }
+        return Response.Warn("stop fail");
     }
 
     @RequestMapping(value = "/nodeRestart", method = RequestMethod.POST)
@@ -87,7 +86,10 @@ public class NodeController {
     public Response nodeRestart(@RequestBody NodeRequestPram nodeRequestPram){
         nodeOperate = nodeManager.factoryOperate( nodeRequestPram.getPluginType() );
         boolean res = nodeOperate.restart( nodeRequestPram.getReq() );
-        return Response.Result(Response.DEFAULT, res);
+        if( res  ){
+            return Response.Success();
+        }
+        return Response.Warn("restart fail");
     }
 
 
@@ -96,7 +98,10 @@ public class NodeController {
     public Response nodeRemove(@RequestBody NodeRequestPram nodeRequestPram){
         nodeOperate = nodeManager.factoryOperate( nodeRequestPram.getPluginType() );
         boolean res = nodeOperate.remove( nodeRequestPram.getReq() );
-        return Response.Result(Response.DEFAULT, res);
+        if( res  ){
+            return Response.Success();
+        }
+        return Response.Warn("delete fail");
     }
 
     @RequestMapping(value = "/nodeInstall", method = RequestMethod.POST)
@@ -104,7 +109,10 @@ public class NodeController {
     public Response nodeInstall(@RequestBody NodeRequestPram nodeRequestPram){
         nodeOperate = nodeManager.factoryOperate( nodeRequestPram.getPluginType() );
         boolean res = nodeOperate.install( nodeRequestPram.getReq() );
-        return Response.Result(Response.DEFAULT, res);
+        if( res  ){
+            return Response.Success();
+        }
+        return Response.Warn("install fail");
     }
 
     @RequestMapping(value = "/nodePullImage", method = RequestMethod.POST)

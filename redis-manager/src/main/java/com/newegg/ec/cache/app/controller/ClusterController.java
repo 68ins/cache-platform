@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,7 +148,12 @@ public class ClusterController {
     @ResponseBody
     public Response detailNodeList(@RequestParam String address){
         Map<String, Map> detailNodeList = logic.detailNodeList(address);
-        return Response.Result(0, detailNodeList);
+        Map<String,Object> res = new HashMap<>();
+        res.put("nodeList", detailNodeList);
+        Map<String, String> clusterInfo = logic.getClusterInfo(address);
+        res.put("clusterInfo", clusterInfo);
+        System.out.println(res);
+        return Response.Result(0, res);
     }
 
     @RequestMapping(value = "/beSlave", method = RequestMethod.GET)
@@ -159,8 +165,8 @@ public class ClusterController {
 
     @RequestMapping(value = "/beMaster", method = RequestMethod.GET)
     @ResponseBody
-    public Response beMaster(@RequestParam String ip, @RequestParam int port, @RequestParam String masterId){
-        boolean res = logic.beMaster(ip, port, masterId);
+    public Response beMaster(@RequestParam String ip, @RequestParam int port){
+        boolean res = logic.beMaster(ip, port);
         return Response.Result(0, res);
     }
 
@@ -169,5 +175,22 @@ public class ClusterController {
     public Response forgetNode(@RequestParam String ip, @RequestParam int port, @RequestParam String masterId){
         boolean res = logic.forgetNode(ip, port, masterId);
         return Response.Result(0, res);
+    }
+
+    @RequestMapping(value = "/importNode", method = RequestMethod.GET)
+    @ResponseBody
+    public Response importNode(@RequestParam String ip, @RequestParam int port, @RequestParam String masterIP, @RequestParam int masterPort){
+        boolean res = logic.importNode(ip, port, masterIP, masterPort);
+        return Response.Result(0, res);
+    }
+
+    @RequestMapping(value = "/batchConfig", method = RequestMethod.GET)
+    @ResponseBody
+    public Response batchConfig(@RequestParam String ip, @RequestParam int port, @RequestParam String configName, @RequestParam String configValue){
+        boolean res = logic.batchConfig(ip, port, configName, configValue);
+        if( res ){
+            return Response.Success();
+        }
+        return Response.Warn("modify config is fail");
     }
 }

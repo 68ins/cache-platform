@@ -10,7 +10,6 @@ import com.newegg.ec.cache.app.util.NetUtil;
 import com.newegg.ec.cache.app.util.RemoteShellUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
-import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.Node;
 import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
@@ -28,7 +27,7 @@ import java.util.List;
  * Created by lzz on 2018/4/20.
  */
 @Component
-public class MachineManager extends PluginParent implements INodeOperate,INodeRequest {
+public class MachineManager extends PluginParent implements INodeOperate {
     private static CommonLogger logger = new CommonLogger( MachineManager.class );
 
     private static String REDIS_INSTALL_FILE = "redis_install.sh";
@@ -104,16 +103,6 @@ public class MachineManager extends PluginParent implements INodeOperate,INodeRe
     @Override
     public List<Node> getNodeList(int clusterId) {
         return machineNodeDao.getMachineNodeList(clusterId);
-    }
-
-    @Override
-    public String showInstall() {
-        return "plugin/machine/machineCreateCluster";
-    }
-
-    @Override
-    public String showManager() {
-        return "plugin/machine/machineNodeManager";
     }
 
     @Override

@@ -40,3 +40,48 @@
     height: 100%;
     width: 100%;
 }
+
+.table-title-span-button {
+    border-radius: 0px;
+    margin-left: 7px;
+}
+.background-warning{
+    background-color: #f0ad4e !important;
+}
+
+.background-danger{
+    background-color: #d9534f !important;
+}
+
+.background-success{
+    background-color: #5cb85c !important;
+}
+.background-info{
+    background-color: #5bc0de !important;
+}
+.expand-td {
+    text-align: center;
+    background-color: #e6f6fb;
+    color: #5bc0de;
+}
+.pointer {
+    cursor: pointer;
+}
+.master {
+    color: #5cb85c;
+}
+.slave{
+
+}
+.slot{
+    margin-left:3px;
+    border-radius: 0px;
+}
+.success {
+ color: #5cb85c !important;
+}
+
+.option-button {
+    margin-right: 5px;
+    border-radius: 0px;
+}

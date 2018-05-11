@@ -4,14 +4,11 @@ import com.google.common.collect.Lists;
 import com.newegg.ec.cache.app.controller.check.CheckLogic;
 import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.model.Response;
-import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.DateUtil;
 import com.newegg.ec.cache.app.util.HttpClientUtil;
 import com.newegg.ec.cache.app.util.JedisUtil;
-import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import com.newegg.ec.cache.plugin.INodeOperate;
-import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.Node;
 import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
@@ -20,7 +17,6 @@ import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +31,7 @@ import java.util.concurrent.Future;
  * Created by lzz on 2018/4/20.
  */
 @Component
-public class HumpbackManager extends PluginParent implements INodeOperate,INodeRequest {
+public class HumpbackManager extends PluginParent implements INodeOperate {
 
     private static CommonLogger logger = new CommonLogger( HumpbackManager.class );
 
@@ -49,7 +45,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     private static final String IMAGE_OPTION_API = "images";
 
     @Autowired
-    IHumpbackNodeDao humpbackNodeDao;
+    IHumpbackNodeDao nodeDao;
     @Resource
     CheckLogic checkLogic;
 
@@ -106,7 +102,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     public boolean start(JSONObject startParam) {
         String ip = startParam.getString("ip");
-        String containerId = startParam.getString("containerId");
+        String containerId = startParam.getString("containerName");
         return optionContainer(ip, containerId, StartType.start);
     }
 
@@ -118,7 +114,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     @Override
     public boolean stop(JSONObject stopParam) {
         String ip = stopParam.getString("ip");
-        String containerId = stopParam.getString("containerId");
+        String containerId = stopParam.getString("containerName");
         return optionContainer(ip, containerId, StartType.stop);
     }
 
@@ -129,9 +125,12 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      */
     @Override
     public boolean restart(JSONObject restartParam) {
-        stop(restartParam);
-        start(restartParam);
-        return true;
+        boolean res;
+        res = stop(restartParam);
+        if( res ){
+            res = start(restartParam);
+        }
+        return res;
     }
 
     /**
@@ -143,10 +142,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
     public boolean remove(JSONObject removePram) {
         System.out.println(removePram);
         logger.websocket( removePram.toString() );
+        int id = removePram.getInt("id");
         String ip = removePram.getString("ip");
-        String containerId = removePram.getString("containerId");
+        String containerId = removePram.getString("containerName");
         try {
-            String url = getApiAddress( ip )+CONTAINER_OPTION_API;
+            String url = getApiAddress( ip ) + CONTAINER_OPTION_API;
             if( HttpClientUtil.getDeleteResponse(url, containerId ) == null) {
                 return false;
             }
@@ -154,6 +154,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
             logger.error("", e);
             return false;
         }
+        nodeDao.removeHumbackNode( id );
         return true;
     }
 
@@ -173,18 +174,8 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
      */
     @Override
     public List<Node> getNodeList(int clusterId) {
-        List<Node> list = humpbackNodeDao.getHumbackNodeList(clusterId);
+        List<Node> list = nodeDao.getHumbackNodeList(clusterId);
         return list;
-    }
-
-    @Override
-    public String showInstall() {
-        return "plugin/humpback/humpbackCreateCluster";
-    }
-
-    @Override
-    public String showManager() {
-        return "plugin/humpback/humpbackNodeManager";
     }
 
     public String getApiAddress(String ip){
@@ -276,7 +267,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate,INodeR
             node.setIp(node.getIp());
             node.setPort(node.getPort());
             node.setAddTime(DateUtil.getTime());
-            humpbackNodeDao.addHumbackNode(node);
+            nodeDao.addHumbackNode(node);
         }
     }
 

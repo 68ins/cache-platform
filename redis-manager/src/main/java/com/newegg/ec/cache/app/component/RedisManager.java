@@ -95,13 +95,15 @@ public class RedisManager {
         return res;
     }
 
-    public boolean beMaster(String ip, int port, String masterId) {
+    public boolean beMaster(String ip, int port) {
         boolean res = false;
         Jedis jedis = new Jedis(ip, port);
         try {
             jedis.clusterFailover();
             res = true;
         } catch (Exception e){
+
+        }finally {
             jedis.close();
         }
         return res;
@@ -115,6 +117,8 @@ public class RedisManager {
             System.out.println(s);
             res = true;
         } catch (Exception e){
+
+        }finally {
             jedis.close();
         }
         return res;

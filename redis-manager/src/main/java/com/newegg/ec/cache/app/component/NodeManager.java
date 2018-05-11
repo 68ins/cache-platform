@@ -1,7 +1,6 @@
 package com.newegg.ec.cache.app.component;
 
 import com.newegg.ec.cache.plugin.INodeOperate;
-import com.newegg.ec.cache.plugin.INodeRequest;
 import com.newegg.ec.cache.plugin.basemodel.PluginType;
 import com.newegg.ec.cache.plugin.docker.DockerManager;
 import com.newegg.ec.cache.plugin.humpback.HumpbackManager;
@@ -40,21 +39,5 @@ public class NodeManager {
                 break;
         }
         return nodeOperate;
-    }
-
-    public INodeRequest factoryRequest(PluginType pluginType){
-        INodeRequest nodeRequest = null;
-        switch ( pluginType ){
-            case machine:
-                nodeRequest = machineManager;
-                break;
-            case docker:
-                nodeRequest = dockerManager;
-                break;
-            case humpback:
-                nodeRequest = humpbackManager;
-                break;
-        }
-        return nodeRequest;
     }
 }

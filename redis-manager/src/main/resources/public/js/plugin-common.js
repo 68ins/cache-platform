@@ -1,3 +1,9 @@
+smarty.register_function( 'json_format', function( params ){
+    var node = params['node'];
+    return JSON.stringify(node);
+});
+
+
 smarty.register_function( 'service_status', function( params ){
     var ip = params['ip'];
     var port = params['port'];
