@@ -74,3 +74,34 @@
     margin: 0;
 }
 
+#create-cluster-form > tbody > tr > td{
+    border: 0px;
+}
+#create-cluster-form > tbody > tr.error-input-tip-tr > td{
+    height: 25px;
+    padding: 0px;
+    overflow-y: hidden;
+}
+#create-cluster-form > tbody > tr.input-tip-tr > td{
+    border: 1px solid #f1f1f1;
+}
+#create-cluster-form > tbody > tr > td.field-name{
+    width: 100px;
+    text-align: left;
+    padding-top: 15px;
+}
+
+.field-value{
+    width: auto;
+}
+
+.no-border-input{
+
+}
+ .sparrow_input_tip_error, .sparrow_input_tip_info, .sparrow_input_tip_ok{
+    padding-left: 28px;
+    line-height: 15px;
+    background-repeat: no-repeat;
+    background-position: 0px;
+}
+

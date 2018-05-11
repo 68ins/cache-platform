@@ -56,4 +56,11 @@ public class DockerNodeDaoTest {
         DockerNode dockerNode = dockerNodeDao.getDockerNode(1);
         System.out.println( dockerNode );
     }
+
+    @Test
+    public void testPackageName(){
+        String packageName = "redis3.0.5.tar";
+        String tmp[] = packageName.split(".tar");
+        System.out.println( tmp[0] );
+    }
 }

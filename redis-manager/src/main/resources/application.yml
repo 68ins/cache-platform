@@ -13,9 +13,9 @@ spring:
   datasource:
       name: serverbase
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://10.16.46.170:3306/redis_manager_new?useUnicode=true&characterEncoding=utf-8
-      username: test
-      password: test
+      url: jdbc:mysql://127.0.0.1:3306/redis_manager_new?useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: root
 
 mybatis:
   mapper-locations: classpath*:mappers/*
@@ -29,5 +29,8 @@ cache:
         image: humpback-hub.newegg.org/shec/redis3.0.6:v3,docker.neg/shec/redis-4.0.8:v1
         api.format: http://%s:8500/dockerapi/v2/
     machine:
-        image: redis3.0.6.tar.gz,redis3.0.7.tar.gz
+        install:
+            shell: /shell/redis_install.sh
+            package: /package
+        image: redis3.0.6.tar
 

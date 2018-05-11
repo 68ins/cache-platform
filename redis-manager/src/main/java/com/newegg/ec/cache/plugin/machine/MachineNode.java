@@ -25,10 +25,6 @@ public class MachineNode extends Node{
     private String ip;
     @MysqlField(field = "port", type = "smallint", notNull = true)
     private int port;
-    @MysqlField(field = "start_command", type = "varchar(200)", notNull = true)
-    private String startCommand;
-    @MysqlField(field = "stop_command", type = "varchar(200)", notNull = true)
-    private String stopCommand;
     @MysqlField(field = "install_path", type = "varchar(200)", notNull = true)
     private String installPath;
 
@@ -91,22 +87,6 @@ public class MachineNode extends Node{
         this.port = port;
     }
 
-    public String getStartCommand() {
-        return startCommand;
-    }
-
-    public void setStartCommand(String startCommand) {
-        this.startCommand = startCommand;
-    }
-
-    public String getStopCommand() {
-        return stopCommand;
-    }
-
-    public void setStopCommand(String stopCommand) {
-        this.stopCommand = stopCommand;
-    }
-
     public String getInstallPath() {
         return installPath;
     }
@@ -134,8 +114,6 @@ public class MachineNode extends Node{
                 ", password='" + password + '\'' +
                 ", ip='" + ip + '\'' +
                 ", port=" + port +
-                ", startCommand='" + startCommand + '\'' +
-                ", stopCommand='" + stopCommand + '\'' +
                 ", installPath='" + installPath + '\'' +
                 ", addTime=" + addTime +
                 '}';

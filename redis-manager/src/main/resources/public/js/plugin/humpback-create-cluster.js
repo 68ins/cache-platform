@@ -1,10 +1,11 @@
 $(document).ready(function(){
+    window.pluginType = "humpback";
     window.clusterId = getQueryString("clusterId");
     init_install_ui(window.clusterId);
 });
 
 function init_install_ui(clusterId){
-    getImageList("humpback", function(obj){
+    getImageList(window.pluginType, function(obj){
         console.log( obj );
         var userGroup = window.user.userGroup || "";
         var groupList = [];
@@ -19,12 +20,12 @@ function init_install_ui(clusterId){
 $(document).on("click", "#start-install-cluster", function(obj){
     var installParam = sparrow_form.encode( "create-cluster-form", 1 );
     if ( !sparrow.empty( installParam )  ){
-        installParam.pluginType = "humpback";
+        installParam.pluginType = window.pluginType;
         if( clusterId ){
             installParam.clusterId = clusterId;
         }
         var param = {
-            "pluginType":"humpback",
+            "pluginType": window.pluginType,
             "req": installParam
         }
         console.log( param );

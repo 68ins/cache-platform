@@ -30,16 +30,6 @@ public class RemoteShellUtil {
         this.password = password;
     }
 
-    public static long pingTime(String ip){
-        long startTime = System.currentTimeMillis();
-        try {
-            InetAddress.getByName( ip ).isReachable(3000);
-        } catch (IOException e) {
-            logger.error( e );
-        }
-        long endTime = System.currentTimeMillis();
-        return endTime - startTime;
-    }
 
     /**
      * 登录远程Linux主机
@@ -69,19 +59,6 @@ public class RemoteShellUtil {
         return result;
     }
 
-    public static void localExec(WebSocketSession socket, String cmd){
-        try {
-            String[] cmds = { "/bin/sh", "-c", cmd };
-            Process ps = Runtime.getRuntime().exec( cmds );
-            InputStream in = ps.getInputStream();
-            processStdout2( socket, in );
-            InputStream errorIn = ps.getErrorStream();
-            processStdout2( socket, errorIn );
-        }
-        catch (Exception e) {
-            logger.error( e );
-        }
-    }
 
     /**
      * 执行Shell脚本或命令
@@ -100,49 +77,6 @@ public class RemoteShellUtil {
                 result = processStdout(in);
                 InputStream errorIn = session.getStderr();
                 result += processStdout(errorIn);
-            }
-        } catch (IOException e) {
-            logger.error( e );
-        } finally {
-            conn.close();
-        }
-        return result;
-    }
-
-    public String exec2(WebSocketSession socket, String cmds) {
-        String result = "";
-        Session session = null;
-        try {
-            if (this.login()) {
-                session = conn.openSession(); // 打开一个会话
-                session.execCommand(cmds);
-                InputStream in = session.getStdout();
-                result = processStdout2(socket,in);
-                InputStream errorIn = session.getStderr();
-                result += processStdout2(socket,errorIn);
-                socket.sendMessage(new TextMessage( "finish ######################!" ));
-            }
-        } catch (IOException e) {
-            if( null != session ){
-                session.close();
-            }
-            logger.error( e );
-        } finally {
-            conn.close();
-        }
-        return result;
-    }
-
-    public String exec(String clusterid, String cmds) {
-        String result = "";
-        try {
-            if (this.login()) {
-                Session session = conn.openSession(); // 打开一个会话
-                session.execCommand(cmds);
-                InputStream in = session.getStdout();
-                result = this.processStdout3(in, clusterid);
-                InputStream errorIn = session.getStderr();
-                result += this.processStdout3(errorIn, clusterid);
             }
         } catch (IOException e) {
             logger.error( e );
@@ -178,33 +112,4 @@ public class RemoteShellUtil {
 
     }
 
-    /**
-     * 解析流获取字符串信息
-     * @return
-     */
-    public static String processStdout2(WebSocketSession socket, InputStream in) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                socket.sendMessage(new TextMessage( line ));
-            }
-        } catch (IOException e) {
-            logger.error( e );
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                logger.error( e );
-            }
-        }
-        return sb.toString();
-    }
-
-    public static  String processStdout3(InputStream in, String clusterid) {
-        //
-        return null;
-    }
 }
