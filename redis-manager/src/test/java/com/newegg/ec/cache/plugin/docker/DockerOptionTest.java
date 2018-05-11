@@ -2,12 +2,15 @@ package com.newegg.ec.cache.plugin.docker;
 
 import com.newegg.ec.cache.Application;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.IOException;
 
 /**
  * Created by lf52 on 2018/5/8.
@@ -26,23 +29,43 @@ public class DockerOptionTest {
 
     @Test
     public void testcreateContainer() {
-        JSONObject reqObject = new JSONObject();
-        reqObject.put("image", "ssecbigdata02:5000/redis4.0.1");
-        reqObject.put("container_name", "leoredistest");
-        reqObject.put("container_volume", "/data/redis");
-        reqObject.put("machine_volume", "/data/redis");
-        reqObject.put("network_mode", "host");
-        reqObject.put("restart_policy", "always");
-        reqObject.put("cmd", "/redis/redis-4.0.1/start.sh 7001 10.16.46.170");
-        System.out.println(docker.createContainer("10.16.46.170", reqObject));
+        JSONObject installObject = generateInstallObject("ssecbigdata02:5000/redis4.0.1","leoredistest","/redis/redis-4.0.1/start.sh 7001 10.16.46.170");
+        System.out.println(docker.createContainer("10.16.46.170", installObject));
     }
     @Test
-    public void optionContainer() {
+    public void testoptionContainer() {
         System.out.println(docker.optionContainer("10.16.46.170", "leoredistest", StartType.stop));
     }
 
     @Test
-    public void removeContainer() {
+    public void testremoveContainer() {
         System.out.println(docker.deleteContainer("10.16.46.170", "leoredistest"));
     }
+
+    @Test
+    public void testimagePull() throws IOException {
+        System.out.println(docker.imagePull("10.16.46.171", "shec/itemserviceprd:v1.2.3.4.2"));
+    }
+
+    private JSONObject generateInstallObject(String image, String name, String command){
+
+        JSONObject req = new JSONObject();
+        req.put("Image", image);
+        req.put("HostName", name);
+        JSONObject hostConfig = new JSONObject();
+        hostConfig.put("NetworkMode", "host");
+        JSONObject restartPolicy = new JSONObject();
+        restartPolicy.put("Name", "always");
+        hostConfig.put("RestartPolicy", restartPolicy);
+        JSONArray binds = new JSONArray();
+        String bindStr = "/data/redis:/data/redis" ;
+        binds.add( bindStr );
+        hostConfig.put("Binds", binds);
+        req.put("HostConfig", hostConfig);
+        String[] cmds = command.split("\\s+");
+        req.put("Cmd", cmds);
+
+        return req;
+    }
+
 }

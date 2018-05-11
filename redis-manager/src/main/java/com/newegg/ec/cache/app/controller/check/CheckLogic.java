@@ -48,7 +48,7 @@ public class CheckLogic {
     }
 
     public Response checkAddress(String address) {
-        Host host = NetUtil.getHostPassAddress( address );
+        Host host = NetUtil.getHostPassAddress(address);
         if( null != host ){
             return Response.Success();
         }else{
@@ -98,6 +98,11 @@ public class CheckLogic {
     public Response checkHumpbackBatchInstall(JSONObject req){
         return Response.Success();
     }
+
+    public Response checkDockerBatchInstall(JSONObject req){
+        return Response.Success();
+    }
+
     public Response checkMachineBatchInstall(JSONObject req){
         Response response;
         response = checkBatchHostNotPass( req );
