@@ -39,7 +39,7 @@
     </style>
 </head>
 <body>
-<div class="body-contain container-color scrollbar-div scrollbar-div-1">
+<div class="body-contain container-color scrollbar-div scrollbar-div-1" style="height:100%;overflow-y:auto">
     <div class="data-container scrollbar">
         <div class="detail-header">
             <div class="cluster-name-container">
@@ -180,7 +180,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="panel panel-default">
+                    <div class="panel panel-default" style="margin:0px">
                         <div class="panel-heading" style="font-size:18px">
                             Detail Charts
                         </div>
@@ -251,8 +251,8 @@
                             <div id="charts-hitRate" class="col-md-4 chart-sm" >
                             </div>
                         </div>
-                        <div class="panel-body  scrollbar-div scrollbar-div-1" >
-                            <div class="slow-log-container">
+                        <div class="panel-body   scrollbar-div-1" >
+                            <div class="slow-log-container" style="margin-left:0px">
                                 <select id="logNodeList" class="selectpicker show-tick form-control" title="Slow Log" data-live-search="true" data-width="250px">
                                 </select>
                                 <!--<button  class="btn btn-default" data-loading-text="loading..." type="button" autocomplete="off" id="slow_log">
