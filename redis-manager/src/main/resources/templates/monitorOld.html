@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Title</title>
+    <title>Cluster Monitor Detail</title>
     <link href="../vender/datatables/dataTables.bootstrap.css" rel="stylesheet" charset="utf-8" />
     <link rel="stylesheet" href="../vender/bootstrap-3.3.7/css/bootstrap.css"/>
     <!--<link rel="stylesheet" href="../css/bootstrap-reset.css"/>-->
@@ -28,18 +28,9 @@
     <script src="../vender/sparrow/util.js"></script>
     <script src="../vender/sparrow/smarty.js"></script>
     <script src="../js/common.js"></script>
-    <script type="text/javascript" src="../vender/echarts/echarts.js"></script>
-
-    <style type="text/css">
-        .chart-sm{
-            height: 200px;
-            width: 400px;
-            margin-top 20px;
-        }
-    </style>
 </head>
 <body>
-<div class="body-contain container-color scrollbar-div scrollbar-div-1" style="height:100%;overflow-y:auto">
+<div class="body-container container-color scrollbar-div scrollbar-div-1">
     <div class="data-container scrollbar">
         <div class="detail-header">
             <div class="cluster-name-container">
@@ -114,12 +105,12 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="panel panel-default my-panel">
-                        <div class="panel-heading" style="font-size: 18px;">
+                        <div class="panel-heading">
                             <div>
                                 <span class="label-success cluster-info">Cluster Healthy</span>
                                 Cluster nodes: <b class="label-success">2</b> | Master Size: <b class="label-success">1</b>
                             </div>
-                            <div class="panel-heading-right" style="display:none">
+                            <div class="panel-heading-right">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                         Command <span class="caret"></span>
@@ -136,42 +127,43 @@
 
                         </div>
                         <div class="base-info-list">
-                            <ul style="padding:10px">
+                            <ul>
                                 <li>
                                     <span class="info-container">
                                         <span class="glyphicon glyphicon-hourglass info"></span>
-                                        <span class="title"> 响应时间 : <span id="avg-response">1</span>/ms</span>
+                                        <span class="title"> AvgResponse : <span id="avg-response">1</span>/ms</span>
                                     </span>
-                                    <div  id="top-response-time" style="font-size: 20px;">
+                                    <div class="panel-body" id="top-response-time">
                                     </div>
                                 </li>
                                 <li>
                                     <span class="info-container">
                                         <span class="glyphicon glyphicon-piggy-bank info"></span>
-                                        <span class="title"> key总数 : <span id="all-key">931001</span></span>
-
+                                        <span class="title"> AllKeys : <span id="all-key">931001</span></span>
                                     </span>
-                                    <div id="top-connection" style="font-size: 20px;">
-                                        <p class="top-item">Max: <span class="top_request_monitor" id="max-all-key">931026</span>
+                                    <div class="panel-body" id="top-connection">
+                                        <p class="top-item">Max: [<span class="top_request_monitor" id="max-all-host">10.16.46.192:8018</span>]
+                                            <span class="danger" id="max-all-key">931026</span>
                                         </p>
-                                        <p class="top-item">Min: <span class="top_request_monitor" id="min-all-key">930976</span>
+                                        <p class="top-item">Min: [<span class="top_request_monitor" id="min-all-host">10.16.46.192:8008</span>]
+                                            <span class="danger" id="min-all-key">930976</span>
                                         </p>
                                     </div>
                                 </li>
                                 <li>
                                     <span class="info-container">
                                         <span class="glyphicon glyphicon-transfer info"></span>
-                                        <span class="title"> 连接数 : <span id="avg-connection">147</span></span>
+                                        <span class="title"> AvgConnection : <span id="avg-connection">147</span></span>
                                     </span>
-                                    <div  id="top-avg-connection" style="font-size: 20px;">
+                                    <div class="panel-body" id="top-avg-connection">
                                     </div>
                                 </li>
                                 <li>
                                     <span class="info-container">
                                         <span class="glyphicon glyphicon-transfer info"></span>
-                                        <span class="title"> 每秒操作数 : <span id="avg-instantaneous">147</span></span>
+                                        <span class="title"> Instantaneous : <span id="avg-instantaneous">147</span></span>
                                     </span>
-                                    <div  id="top-avg-instantaneous" style="font-size: 20px;">
+                                    <div class="panel-body" id="top-avg-instantaneous">
                                     </div>
                                 </li>
                             </ul>
@@ -180,17 +172,16 @@
                 </div>
 
                 <div class="row">
-                    <div class="panel panel-default" style="margin:0px">
-                        <div class="panel-heading" style="font-size:18px">
-                            Detail Charts
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Info Detail</h3>
                         </div>
-
-                        <div class="panel-body" style="overflow: auto; display:none ">
+                        <div class="panel-body" style="overflow: auto">
                             <div class="row">
                                 <div id="node-info-chart" class="col-md-12" style="height: 450px"></div>
                             </div>
                         </div>
-                        <div class="panel-body info-detail scrollbar-div scrollbar-div-1" style="display:none">
+                        <div class="panel-body info-detail scrollbar-div scrollbar-div-1">
                             <table class="table table-bordered scrollbar" id="command-table">
                                 <thead>
                                 <tr id="field-title" class="scrollbar">
@@ -234,31 +225,14 @@
                                 </tbody>
                             </table>
                         </div><!-- .panel-body -->
-
-                        <div class="panel-body" >
-                            <div id="charts-cpu" class="col-md-4 chart-sm" >
-                            </div>
-                            <div id="charts-memory" class="col-md-4 chart-sm" >
-                            </div>
-                            <div id="charts-client" class="col-md-4 chart-sm" >
-                            </div>
-                            <div id="charts-ops" class="col-md-4 chart-sm" >
-                            </div>
-                            <div id="charts-commands" class="col-md-4 chart-sm" >
-                            </div>
-                            <div id="charts-expireKeys" class="col-md-4 chart-sm" >
-                            </div>
-                            <div id="charts-hitRate" class="col-md-4 chart-sm" >
-                            </div>
+                        <div class="slow-log-container">
+                            <select id="logNodeList" class="selectpicker show-tick form-control" title="Slow Log" data-live-search="true" data-width="250px">
+                            </select>
+                            <!--<button  class="btn btn-default" data-loading-text="loading..." type="button" autocomplete="off" id="slow_log">
+                                <span class="glyphicon" aria-hidden="true">slow-log</span>
+                            </button>-->
                         </div>
-                        <div class="panel-body   scrollbar-div-1" >
-                            <div class="slow-log-container" style="margin-left:0px">
-                                <select id="logNodeList" class="selectpicker show-tick form-control" title="Slow Log" data-live-search="true" data-width="250px">
-                                </select>
-                                <!--<button  class="btn btn-default" data-loading-text="loading..." type="button" autocomplete="off" id="slow_log">
-                                    <span class="glyphicon" aria-hidden="true">slow-log</span>
-                                </button>-->
-                            </div>
+                        <div class="panel-body log-table-wrapper scrollbar-div scrollbar-div-1" >
                             <table class="table table-bordered scrollbar" id="slow-log-table">
                                 <thead>
                                 <tr>
@@ -279,7 +253,7 @@
     </div>
 </div>
 <script type="text/javascript" src="../vender/datetime/flatpickr.min.js"></script>
-<script src="../js/monitor2.js"></script>
+<script src="../js/monitor.js"></script>
 <script src="../js/redis-query.js"></script>
 </body>
 

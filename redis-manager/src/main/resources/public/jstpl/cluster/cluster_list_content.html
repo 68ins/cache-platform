@@ -12,16 +12,20 @@
                                 <span><b>{{$cluster.clusterName}}</b></span>
                             </div>
                             <div class="one-data" id="cluster-state-{{$cluster.id}}">
+                                <i class="icon-heart icon-margin"></i>
+                                <span>State:&nbsp</span>
                                 <b>{{cluster_state address=$cluster.address id=$cluster.id}}</b>
                             </div>
                             <div class="one-data">
+                                <i class="icon-group icon-margin"></i>
                                 <span>Group:&nbsp</span>
                                 <span>{{$cluster.userGroup}}</span>
                             </div>
-                            <!--<div class="one-data">
-                                <span>Address:&nbsp</span>
-                                <span><b>{{$cluster.address}}</b></span>
-                            </div>-->
+                            <div class="one-data">
+                                <i class="icon-tag icon-margin"></i>
+                                <span>Type:&nbsp</span>
+                                <span>{{$cluster.clusterType}}</span>
+                            </div>
                         </a>
                         <div class="operation-btn-swapper">
                             <a href="/cluster/clusterManager?clusterId={{$cluster.id}}&pluginType={{$cluster.clusterType}}" class="operation-btn">

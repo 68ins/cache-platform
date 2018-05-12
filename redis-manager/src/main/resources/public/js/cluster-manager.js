@@ -97,25 +97,14 @@ smarty.register_function("slot_num", function( params ){
     var  subtract = count - avg;
     var res = "";
     if( subtract > 20 ){
-        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' ↑ </span>';
+        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' <i class="icon-long-arrow-up"></i></span>';
     }else if( subtract < -20 ){
-        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' ↓ </span>';
+        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' <i class="icon-long-arrow-down"></i></span>';
     }else{
         res = '<span class="badge slot" data-status="normal"  data-index="' + index + '">' + count + '</span>';
     }
     return res;
 });
-
-smarty.register_function( 'cycle_color', function(params){
-    var id = params["id"];
-    var role = params["role"];
-    var res = "";
-    if( role == "master" ){
-        res += " style='background-color:#e7f6fb'";
-    }
-    return res;
-});
-
 
 smarty.register_function("new_node_show", function( params ){
     var slaveList = params['slaveList'];
@@ -156,9 +145,9 @@ smarty.register_function("slot_num", function( params ){
     var  subtract = count - avg;
     var res = "";
     if( subtract > 20 ){
-        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' ↑ </span>';
+        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' <i class="icon-long-arrow-up"></i></span>';
     }else if( subtract < -20 ){
-        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' ↓ </span>';
+        res =  '<span class="badge background-warning slot" data-status="warn" data-index="' + index + '">' + count + ' <i class="icon-long-arrow-down"></i></span>';
     }else{
         res = '<span class="badge slot" data-status="normal"  data-index="' + index + '">' + count + '</span>';
     }
@@ -168,11 +157,10 @@ smarty.register_function("slot_num", function( params ){
 smarty.register_function( 'cluster_status', function(params){
     var state = params["state"];
     if( state.toLowerCase() == "ok" ){
-        return "<span class='label label-success'>Cluster Healthy</span>";
+        return "<span class='label-success'>Cluster Healthy</span> ";
     }else {
-        return "<span class='label label-danger'>Cluster Bad</span>";
+        return "<span class='label-danger'>Cluster Bad</span> ";
     }
-
 });
 
 
