@@ -14,6 +14,7 @@ import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.StartType;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -194,8 +195,8 @@ public class HumpbackManager extends PluginParent implements INodeOperate {
         List<Future<Boolean>> futureList = new ArrayList<>();
         nodelist.forEach(node -> {
             String ip = String.valueOf(node.getIp());
-            String port = String.valueOf(node.getPort());
-            String name = containerName + port;
+            int port = node.getPort();
+            String name = formatContainerName( containerName, port );
             String command = ip + " " + port;
             JSONObject reqObject = generateInstallObject(image, name, command);
             futureList.add(executorService.submit(new RedisInstallTask(ip, reqObject)));
@@ -209,6 +210,30 @@ public class HumpbackManager extends PluginParent implements INodeOperate {
             }
         }
         logger.websocket("redis cluster node install success");
+    }
+
+    private String formatContainerName(String containerName, int port){
+        return containerName + port;
+    }
+
+    @Override
+    public String  checkAccess(JSONObject reqParam) {
+        String ipListStr = reqParam.getString(IPLIST_NAME);
+        String containerName = reqParam.getString("containerName");
+        List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
+        String errorMsg = "";
+        for( RedisNode redisNode : nodelist ){
+            String ip = redisNode.getIp();
+            int port = redisNode.getPort();
+            String fomatName = formatContainerName(containerName, port);
+            JSONObject res = getContainerInfo(ip, fomatName);
+            int code = res.getInt("Code");
+            if( code <= 200 ){
+                errorMsg += logger.websocket( ip + ":" + port + " the container name " + fomatName + "alreay exit" );
+                break;
+            }
+        }
+        return errorMsg;
     }
 
     /**
@@ -240,8 +265,8 @@ public class HumpbackManager extends PluginParent implements INodeOperate {
 
     @Override
     protected boolean checkInstall(JSONObject reqParam) {
-        Response checkRes =  checkLogic.checkHumpbackBatchInstall( reqParam );
-        if( checkRes.getCode() == Response.DEFAULT ){
+        String res = checkAccess(reqParam);
+        if( StringUtils.isBlank( res ) ){
             return true;
         }
         return false;
@@ -261,11 +286,11 @@ public class HumpbackManager extends PluginParent implements INodeOperate {
         for(RedisNode redisNode : nodelist){
             HumpbackNode node = new HumpbackNode();
             node.setClusterId(clusterId);
-            node.setContainerName( containerName + redisNode.getPort());
+            node.setContainerName( formatContainerName( containerName, redisNode.getPort() ));
             node.setUserGroup(reqParam.get("userGroup").toString());
             node.setImage(image);
-            node.setIp(node.getIp());
-            node.setPort(node.getPort());
+            node.setIp(redisNode.getIp());
+            node.setPort(redisNode.getPort());
             node.setAddTime(DateUtil.getTime());
             nodeDao.addHumbackNode(node);
         }
@@ -312,6 +337,7 @@ public class HumpbackManager extends PluginParent implements INodeOperate {
         return JSONObject.fromObject(response);
     }
 
+
     /**
      * 获取container 信息
      * @param ip
@@ -319,15 +345,15 @@ public class HumpbackManager extends PluginParent implements INodeOperate {
      * @return
      */
     public JSONObject getContainerInfo(String ip, String containerId) {
-
-        String response = null;
+        JSONObject res = null;
         try {
             String url = getApiAddress(ip) + CONTAINER_OPTION_API;
-            response = HttpClientUtil.getGetResponse(url, containerId);
+            String response = HttpClientUtil.getGetResponse(url, containerId);
+            res = JSONObject.fromObject(response);
         } catch (IOException e) {
             logger.error("",e);
         }
-        return JSONObject.fromObject(response);
+        return res;
     }
 
     /**

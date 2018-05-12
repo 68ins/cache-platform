@@ -42,6 +42,7 @@ $(document).on("click", "#start-install-cluster", function(obj){
 
 function  createClusterStep( data, clusterId){
     smarty.html( "plugin/" + window.pluginType + "/create_cluster_step", data, "create-cluster-container",function () {
+        $("select").selectpicker();
         if( clusterId ){
             // 如果有传入 clusterId 需要重绘界面
             getCluster(clusterId, function (obj) {

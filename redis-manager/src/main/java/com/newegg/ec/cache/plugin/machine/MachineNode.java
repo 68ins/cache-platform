@@ -103,6 +103,14 @@ public class MachineNode extends Node{
         this.addTime = addTime;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "MachineNode{" +

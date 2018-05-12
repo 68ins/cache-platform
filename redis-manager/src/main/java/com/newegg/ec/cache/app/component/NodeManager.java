@@ -1,6 +1,7 @@
 package com.newegg.ec.cache.app.component;
 
 import com.newegg.ec.cache.plugin.INodeOperate;
+import com.newegg.ec.cache.plugin.basemodel.PluginParent;
 import com.newegg.ec.cache.plugin.basemodel.PluginType;
 import com.newegg.ec.cache.plugin.docker.DockerManager;
 import com.newegg.ec.cache.plugin.humpback.HumpbackManager;
@@ -15,11 +16,11 @@ import javax.annotation.Resource;
 @Component
 public class NodeManager {
     @Resource
-    private MachineManager machineManager;
+    public MachineManager machineManager;
     @Resource
-    private DockerManager dockerManager;
+    public DockerManager dockerManager;
     @Resource
-    private HumpbackManager humpbackManager;
+    public HumpbackManager humpbackManager;
 
     public NodeManager(){
 

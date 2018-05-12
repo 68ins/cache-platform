@@ -1,6 +1,5 @@
 package com.newegg.ec.cache.app.controller;
 
-import com.newegg.ec.cache.app.controller.security.WebSecurityConfig;
 import com.newegg.ec.cache.app.dao.impl.NodeInfoDao;
 import com.newegg.ec.cache.app.logic.ClusterLogic;
 import com.newegg.ec.cache.app.model.*;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +56,14 @@ public class ClusterController {
         listCluster = logic.getClusterList( group );
         return Response.Result(0, listCluster);
     }
+
+    @RequestMapping(value = "/clusterExistAddress", method = RequestMethod.GET)
+    @ResponseBody
+    public Response clusterExistAddress(@RequestParam String address){
+        boolean isexist = logic.clusterExistAddress( address );
+        return Response.Result(Response.DEFAULT, isexist);
+    }
+
 
     @RequestMapping(value = "/listClusterByUser", method = RequestMethod.GET)
     @ResponseBody

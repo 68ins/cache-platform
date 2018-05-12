@@ -2,6 +2,24 @@
 var win_body_css = 'sparrow_window_content_body';
 var current_win_id = [];
 var sparrow_win ={
+        msg: function(message){
+            layer.msg( message );
+        },
+        alert: function(title, option){
+            if( !option ){
+                option = {};
+            }
+            layer.alert( title, option);
+        },
+        confirm: function( title, callback ){
+            layer.alert( title, {
+            }, function(){
+                if ( 'function' === typeof callback ){
+                    callback();
+                    layer.closeAll();
+                }
+            });
+        },
         /**
 		 * 弹出一个框,如果这个框存在了,将不会再打开, 而只是刷新内容
 		 */

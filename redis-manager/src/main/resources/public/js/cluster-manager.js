@@ -289,7 +289,7 @@ $(document).on("click", "#import-node", function(){
             var tmps = hostArr[0].split(":");
             var masterIp = tmps[0];
             var masterPort = tmps[1];
-            importNode(data.ip, data.port,masterIP,masterPort, function(){
+            importNode(data.ip, data.port,masterIp,masterPort, function(){
 
             });
         });
@@ -321,25 +321,32 @@ $(document).on("click", ".be-master", function(){
     var data = {};
     data["ip"] = $(this).data("ip");
     data["port"] = $(this).data("port");
-    layer.alert('Confirm set the node master', {icon: 6},function(){
+    sparrow_win.confirm('Confirm set the node master',function(){
         beMaster(ip,port,function(){
-
+            sparrow_win.msg("be master");
         });
      });
 });
 
 $(document).on("click", ".forget-node", function(){
-    var masterId = $(this).data("masterid");
+    var masterId = $(this).data("nodeid");
     var ip = $(this).data("ip");
     var port = $(this).data("port");
-    layer.alert("Confirm forget "+ ip + ":" + port +" the node", {icon: 6},function(){
-        forgetNode(ip,port,masterId, function(){
-
+    sparrow_win.confirm("Confirm forget "+ ip + ":" + port +" the node", function(){
+        var address =  ip + ":" +  port;
+        clusterExistAddress( address, function(obj){
+            if( obj.res == true || obj.res == "true" ){
+                sparrow_win.msg("the node is in cluster db can not forget");
+            }else{
+                forgetNode(ip,port,masterId, function(){
+                     sparrow_win.msg("forget node");
+                });
+            }
         });
-    });
+    })
 });
 
-// slave 迁移
+// be slave
 $(document).on("click", ".be-slave", function(){
     var ip = $(this).data("ip");
     var port = $(this).data("port");
@@ -348,7 +355,7 @@ $(document).on("click", ".be-slave", function(){
         $(".move-slave-confirm").click(function(){
             var masterId = $(this).data("nodeid");
             beSlave(ip,port,masterId, function(){
-
+                sparrow_win.msg("import to...");
             });
         });
     });

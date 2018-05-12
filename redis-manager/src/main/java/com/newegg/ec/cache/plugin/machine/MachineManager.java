@@ -39,6 +39,8 @@ public class MachineManager extends PluginParent implements INodeOperate {
     private String installShell;
     @Value("${cache.machine.install.package}")
     private String installPackage;
+    @Value("${cache.machine.install.basepath}")
+    private String installBasePath;
 
     @Autowired
     IMachineNodeDao  machineNodeDao;
@@ -47,6 +49,11 @@ public class MachineManager extends PluginParent implements INodeOperate {
 
     public MachineManager(){
         //ignore
+    }
+
+    @Override
+    public String checkAccess(JSONObject reqParam) {
+        return null;
     }
 
     /**
@@ -88,10 +95,14 @@ public class MachineManager extends PluginParent implements INodeOperate {
         MachineNode machineNode = (MachineNode) JSONObject.toBean( removePram, MachineNode.class );
         int port = machineNode.getPort();
         RemoteShellUtil rms = new RemoteShellUtil(machineNode.getIp(), machineNode.getUsername(), machineNode.getPassword());
-        String cmd =  getPortPath(machineNode.getInstallPath(), port );
-        System.out.println( cmd );
-        rms.exec( cmd );
-        return false;
+        String path = getPortPath(machineNode.getInstallPath(), port );
+        if( path.length() > 4 ){
+            String cmd =  "rm -rf " + getPortPath(machineNode.getInstallPath(), port );
+            rms.exec( cmd );
+        }
+        boolean res = machineNodeDao.removeMachineNode( machineNode.getId() );
+        System.out.println( res );
+        return res;
     }
 
 
@@ -161,7 +172,7 @@ public class MachineManager extends PluginParent implements INodeOperate {
                 String[] cmds = new String[3];
                 cmds[0] = "cd " + installPath;
                 cmds[1] = "/usr/bin/wget http://"+ localIp + ":" + servicePort + installShell + " -O " + REDIS_INSTALL_FILE;
-                cmds[2] = "bash " + REDIS_INSTALL_FILE + " " + packageUrl + " " + imagePackage + " " +  port;
+                cmds[2] = "bash " + REDIS_INSTALL_FILE + " " + packageUrl + " " + imagePackage + " " +  port + " " + installBasePath;
                 String cmd = StringUtils.join( cmds, ";");
                 String installRes = rms.exec( cmd );
                 logger.websocket( installRes );
@@ -175,12 +186,13 @@ public class MachineManager extends PluginParent implements INodeOperate {
         MachineNode machineNode = (MachineNode) JSONObject.toBean( startParam, MachineNode.class );
         int port = machineNode.getPort();
         RemoteShellUtil rms = new RemoteShellUtil(machineNode.getIp(), machineNode.getUsername(), machineNode.getPassword());
-        String cmd =  "bash " + getPortPath(machineNode.getInstallPath(), port ) + startType + ".sh " + port;
+        String cmd = "cd " + getPortPath(machineNode.getInstallPath(), port );
+        cmd +=  "; bash "  + startType + ".sh " + port;
         System.out.println( cmd );
         rms.exec( cmd );
     }
 
     private String getPortPath(String installPath, int port) {
-        return installPath + "/" + port + "/";
+        return installPath + "/" + installBasePath + "/" + port + "/";
     }
 }

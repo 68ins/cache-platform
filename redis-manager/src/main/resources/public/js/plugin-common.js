@@ -11,11 +11,12 @@ smarty.register_function( 'service_status', function( params ){
     checkPortPass(ip, port, function(obj){
         var code = parseInt(obj.code);
         var statusObj = $("#status-" + id );
+        var status = "FAIL";
         if(code == 0){
-            statusObj.text("OK");
-        } else {
-            statusObj.text("FAIL");
+            status = "OK";
         }
+        statusObj.text( status );
+        $("#node-" + id).data("status", status);
     });
 });
 
@@ -37,8 +38,9 @@ smarty.register_function( 'in_cluster', function( params ){
            break;
         }
     }
+    var inCluster = "NO";
     if( isInCluster ){
-        return "YES";
+        inCluster = "YES";
     }
-    return "NO";
+    return inCluster;
 });

@@ -1,17 +1,24 @@
 package com.newegg.ec.cache.app.controller.check;
 
 import com.newegg.ec.cache.app.dao.IClusterDao;
+import com.newegg.ec.cache.app.logic.ClusterLogic;
+import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.Host;
 import com.newegg.ec.cache.app.model.Response;
+import com.newegg.ec.cache.app.model.User;
 import com.newegg.ec.cache.app.util.JedisUtil;
 import com.newegg.ec.cache.app.util.NetUtil;
 import com.newegg.ec.cache.app.util.RemoteShellUtil;
+import com.newegg.ec.cache.app.util.RequestUtil;
 import com.newegg.ec.cache.core.logger.CommonLogger;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,8 +27,8 @@ import java.util.Set;
 @Component
 public class CheckLogic {
     public static CommonLogger logger = new CommonLogger(CheckLogic.class);
-    @Resource
-    private IClusterDao clusterDao;
+    @Autowired
+    private ClusterLogic clusterLogic;
 
     private String checkLog(String msg){
         return logger.websocket(msg) + "<br>";
@@ -56,7 +63,14 @@ public class CheckLogic {
         }
     }
 
-    public Response checkClusterNameByUserid(String clusterId, int id) {
+    public Response checkClusterNameByUserid(String clusterId) {
+        User user = RequestUtil.getUser();
+        List<Cluster> clusters = clusterLogic.getClusterListByUser(user);
+        for (Cluster cluster : clusters){
+            if( clusterId.equals( cluster.getClusterName() ) ){
+                return Response.Error("the cluster name is alreay");
+            }
+        }
         return Response.Success();
     }
 
@@ -88,15 +102,10 @@ public class CheckLogic {
             }
         }
         if( !StringUtils.isBlank( errorMsg) ){
-            System.out.println( errorMsg );
             return Response.Error( errorMsg );
         }else{
             return Response.Success();
         }
-    }
-
-    public Response checkHumpbackBatchInstall(JSONObject req){
-        return Response.Success();
     }
 
     public Response checkDockerBatchInstall(JSONObject req){

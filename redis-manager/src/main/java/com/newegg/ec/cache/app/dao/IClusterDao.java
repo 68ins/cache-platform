@@ -12,6 +12,8 @@ import java.util.List;
 public interface IClusterDao {
     List<Cluster> getClusterList(String userGroup);
 
+    List<Cluster> getClusterByAddress(String address);
+
     Cluster getCluster(int id);
 
     int removeCluster(int id );

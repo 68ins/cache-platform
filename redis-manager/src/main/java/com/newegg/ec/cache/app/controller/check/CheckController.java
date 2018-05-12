@@ -56,8 +56,7 @@ public class CheckController {
     @RequestMapping(value = "/checkClusterName", method = RequestMethod.GET)
     @ResponseBody
     public Response checkClusterName(@RequestParam String clusterId){
-        User user = RequestUtil.getUser();
-        return logic.checkClusterNameByUserid( clusterId, user.getId());
+        return logic.checkClusterNameByUserid( clusterId );
     }
 
     @RequestMapping(value = "/checkRule", method = RequestMethod.POST)
@@ -104,4 +103,6 @@ public class CheckController {
         JSONObject jsonObject = JSONObject.fromObject( req );
         return logic.checkBatchUserPermisson( jsonObject );
     }
+
+
 }

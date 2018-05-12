@@ -4,7 +4,7 @@ set -e
 package_url="$1"
 package="$2"
 port=$3
-install_tag="redis-cluster"
+install_tag="$4"
 
 # 检测目录
 if [ ! -d "${install_tag}" ]; then

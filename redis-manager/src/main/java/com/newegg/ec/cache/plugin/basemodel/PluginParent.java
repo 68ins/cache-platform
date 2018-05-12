@@ -36,19 +36,12 @@ public abstract class PluginParent {
         String ipListStr = reqParam.getString(IPLIST_NAME);
         Map<RedisNode, List<RedisNode>> ipMap = JedisUtil.getInstallNodeMap(ipListStr);
         List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
-        boolean res = false;
         // 安装节点
         pluginParent.installNodeList(reqParam, nodelist);
         // 判断节点是否成功
         boolean checkRes = pluginParent.checkInstallResult( nodelist );
-        // 成功就更新 cluster address
-        if( checkRes ){
-            // 建立集群
-            pluginParent.buildRedisCluster( ipMap );
-            res = true;
-        }
-        if( res ){ // 如果安装成功
-            int clusterId;
+        int clusterId = 0;
+        if( checkRes ){ // 如果安装成功
             if( reqParam.containsKey("clusterId") ){  //如果有传 clusterId 那么证明是从扩容界面来的
                 clusterId = reqParam.getInt("clusterId");
             }else{
@@ -57,9 +50,10 @@ public abstract class PluginParent {
             if(clusterId != -1){
                 pluginParent.addNodeList(reqParam, clusterId);
             }
-
         }
-        return res;
+        // 建立集群
+        pluginParent.buildRedisCluster( clusterId, ipMap );
+        return checkRes;
     }
 
     protected abstract boolean checkInstall(JSONObject reqParam);
@@ -95,8 +89,8 @@ public abstract class PluginParent {
         return clusterId;
     }
 
-    protected void buildRedisCluster(Map<RedisNode, List<RedisNode>> ipMap){
-        redisManager.buildCluster( ipMap );
+    protected void buildRedisCluster(int clusterId, Map<RedisNode, List<RedisNode>> ipMap){
+        redisManager.buildCluster( clusterId, ipMap );
     }
 
     protected boolean checkInstallResult(List<RedisNode> ipList){

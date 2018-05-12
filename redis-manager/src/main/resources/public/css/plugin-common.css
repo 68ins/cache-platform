@@ -119,4 +119,9 @@
 .dataTables_info,.dataTables_length,.dataTables_paginate,.dataTables_filter{
    display:none;
 }
-
+.ip-list-tip{
+    border: 0px;
+    color:#9E9E9E;
+    margin-left: -10px;
+    background-color: #ffffff;
+}

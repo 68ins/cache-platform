@@ -46,6 +46,14 @@ public class ClusterLogic {
         return clusterDao.getClusterList( group );
     }
 
+    public boolean clusterExistAddress(String address){
+        List<Cluster> list = clusterDao.getClusterByAddress(address);
+        if( list.isEmpty() ){
+            return false;
+        }
+        return true;
+    }
+
     public boolean removeCluster(int id){
         boolean res = false;
         try {
@@ -179,8 +187,8 @@ public class ClusterLogic {
         return redisManager.beMaster(ip, port);
     }
 
-    public boolean forgetNode(String ip, int port, String masterId) {
-        return redisManager.forget(ip, port, masterId);
+    public boolean forgetNode(String ip, int port, String nodeId) {
+        return redisManager.forget(ip, port, nodeId);
     }
 
     public boolean importNode(String ip, int port, String masterIP, int masterPort) {

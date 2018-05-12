@@ -101,8 +101,8 @@ public class DockerManager extends PluginParent implements INodeOperate {
             String ip = String.valueOf(node.getIp());
             String port = String.valueOf(node.getPort());
             String image = reqParam.getString("image");
-            String name = reqParam.getString("container_name");
-            String command = "/redis/redis-4.0.1/start.sh "+port+" "+ip;
+            String name = reqParam.getString("containerName");
+            String command = port + " "+ ip;
             JSONObject installObject = generateInstallObject(image,name,command);
             futureList.add(executorService.submit(new RedisInstallTask(ip,installObject)));
         });
@@ -114,6 +114,25 @@ public class DockerManager extends PluginParent implements INodeOperate {
             }
         }
         logger.websocket("redis cluster node install success");
+    }
+
+    @Override
+    public String checkAccess(JSONObject reqParam) {
+        String ipListStr = reqParam.getString(IPLIST_NAME);
+        String containerName = reqParam.getString("containerName");
+        List<RedisNode> nodelist = JedisUtil.getInstallNodeList(ipListStr);
+        String errorMsg = "";
+        for( RedisNode redisNode : nodelist ){
+            String ip = redisNode.getIp();
+            int port = redisNode.getPort();
+            String fomatName = formatContainerName(containerName, port);
+            JSONObject res = getContainerInfo(ip, fomatName);
+            if( res.size() > 1 ){
+                errorMsg += logger.websocket( ip + ":" + port + " the container name " + fomatName + "alreay exit" );
+                break;
+            }
+        }
+        return errorMsg;
     }
 
     @Override
@@ -129,27 +148,26 @@ public class DockerManager extends PluginParent implements INodeOperate {
             node.setContainerName( containerName + redisNode.getPort());
             node.setUserGroup(reqParam.get("userGroup").toString());
             node.setImage(image);
-            node.setIp(node.getIp());
-            node.setPort(node.getPort());
+            node.setIp(redisNode.getIp());
+            node.setPort(redisNode.getPort());
             node.setAddTime(DateUtil.getTime());
             dockerNodeDao.addDockerNode(node);
         }
-
     }
 
 
     @Override
     public boolean start(JSONObject startParam) {
         String ip = startParam.getString("ip");
-        String containerId = startParam.getString("containerId");
-        return optionContainer(ip, containerId, StartType.start);
+        String containerName = startParam.getString("containerName");
+        return optionContainer(ip, containerName, StartType.start);
     }
 
     @Override
     public boolean stop(JSONObject stopParam) {
         String ip = stopParam.getString("ip");
-        String containerId = stopParam.getString("containerId");
-        return optionContainer(ip, containerId, StartType.stop);
+        String containerName = stopParam.getString("containerName");
+        return optionContainer(ip, containerName, StartType.stop);
     }
 
     @Override
@@ -163,8 +181,8 @@ public class DockerManager extends PluginParent implements INodeOperate {
     public boolean remove(JSONObject removePram) {
         logger.websocket(removePram.toString());
         String ip = removePram.getString("ip");
-        String containerId = removePram.getString("containerId");
-        return deleteContainer(ip, containerId);
+        String containerName = removePram.getString("containerName");
+        return deleteContainer(ip, containerName);
     }
 
 
@@ -182,19 +200,23 @@ public class DockerManager extends PluginParent implements INodeOperate {
      * 获取container信息
      * 用于判断当前名称的容器是否存在
      * @param ip
-     * @param containerId
+     * @param containerName
      * @return
      */
-    public JSONObject getContainerInfo(String ip, String containerId) {
+    public JSONObject getContainerInfo(String ip, String containerName) {
         String res = null;
         try {
             String url = getContainerApi(ip);
-            res = HttpClientUtil.getGetResponse(url, containerId + "/json");
+            res = HttpClientUtil.getGetResponse(url, containerName + "/json");
         } catch (Exception e) {
             logger.error( "", e );
         }
         JSONObject result = JSONObject.fromObject(res);
         return result;
+    }
+
+    private String formatContainerName(String containerName, int port){
+        return containerName + port;
     }
 
     /**

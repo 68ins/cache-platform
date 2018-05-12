@@ -29,35 +29,82 @@ $("[href='#add-node']").click( function () {
 
 $(document).on("click", ".start-node", function(){
     var reqParam = getReqParam( this );
-    nodeStart(reqParam, function(obj){
-        console.log(obj);
+    if( reqParam.status == "OK" ){
+        sparrow_win.alert("The node already start");
+        return;
+    }
+    layer.alert("Confirm start the node", {icon: 6, time: 1000},function(){
+        nodeStart(reqParam, function(obj){
+            console.log(obj);
+        });
     });
 });
 
 $(document).on("click", ".stop-node", function(){
     var reqParam = getReqParam( this );
-    nodeStop(reqParam, function(obj){
-        console.log(obj);
+    if( reqParam.inCluster == "YES" && window.nodeList.length != 1 ){
+        sparrow_win.alert("The node is in cluster please forget it then retry");
+        return;
+    }
+    sparrow_win.confirm("Confirm stop the node", function(){
+        nodeStop(reqParam, function(obj){
+            $("[href='#node-list']").trigger("click");
+        });
     });
 });
 
 $(document).on("click", ".restart-node", function(){
     var reqParam = getReqParam( this );
-    nodeRestart(reqParam, function(obj){
-        console.log(obj);
+    sparrow_win.confirm("Confirm restart the node", function(){
+        nodeRestart(reqParam, function(obj){
+            $("[href='#node-list']").trigger("click");
+        });
     });
 });
 
 $(document).on("click", ".delete-node", function(){
     var reqParam = getReqParam( this );
-    nodeRemove(reqParam, function(obj){
-        console.log(obj);
+    if( reqParam.status == "OK" ){
+        sparrow_win.alert("The node is running please stop it");
+        return;
+    }
+    sparrow_win.confirm("Confirm delete the node", function(){
+        nodeRemove(reqParam, function(obj){
+            $("[href='#node-list']").trigger("click");
+        });
     });
 });
+
+$(document).on("click", ".import-node-to-cluster", function(){
+    var reqParam = getReqParam( this );
+    if( reqParam.inCluster == "YES" ){
+        sparrow_win.alert("The node is already in cluster");
+        return;
+    }
+    sparrow_win.confirm("Confirm import the node to cluster", function(){
+        var nodeDetail = reqParam.req;
+        var clusterId = nodeDetail.clusterId;
+        getCluster( clusterId, function(obj){
+            var cluster = obj.res;
+            var hostArr = cluster.address.split(",");
+            var tmps = hostArr[0].split(":");
+            var masterIp = tmps[0];
+            var masterPort = tmps[1];
+            importNode(nodeDetail.ip, nodeDetail.port,masterIp,masterPort, function(){
+                $("[href='#node-list']").trigger("click");
+            });
+        });
+    });
+});
+
+
 
 function getReqParam(obj){
     var nodeRequestPram = {"pluginType": window.pluginType};
     var detail = getNodeDetail(obj);
+    var id = detail.id;
+    nodeRequestPram.inCluster = $("#in-cluster-" + id).text();
+    nodeRequestPram.status = $("#node-" + id).data("status");
     nodeRequestPram.req = detail;
     return nodeRequestPram;
 }

@@ -5,6 +5,8 @@ import com.newegg.ec.cache.app.component.redis.IRedis;
 import com.newegg.ec.cache.app.component.redis.JedisClusterClient;
 import com.newegg.ec.cache.app.component.redis.JedisMasterSlaveClient;
 import com.newegg.ec.cache.app.component.redis.RedisClientBase;
+import com.newegg.ec.cache.app.logic.ClusterLogic;
+import com.newegg.ec.cache.app.model.Cluster;
 import com.newegg.ec.cache.app.model.Host;
 import com.newegg.ec.cache.app.model.RedisNode;
 import com.newegg.ec.cache.app.model.RedisQueryParam;
@@ -15,7 +17,9 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +29,8 @@ import java.util.Map;
 @Component
 public class RedisManager {
     public static CommonLogger logger = new CommonLogger(RedisManager.class);
+    @Resource
+    private ClusterLogic clusterLogic;
 
     public IRedis factory(String address){
         IRedis redis;
@@ -109,19 +115,37 @@ public class RedisManager {
         return res;
     }
 
-    public boolean forget(String ip, int port, String masterId) {
-        boolean res = false;
-        Jedis jedis = new Jedis(ip, port);
+    public boolean forget(String ip, int port, String nodeId) {
+        List<Map<String, String>> masterList = JedisUtil.getNodeList(ip, port);
+        Jedis myselef = new Jedis(ip, port);
         try {
-            String s = jedis.clusterForget(masterId);
-            System.out.println(s);
-            res = true;
-        } catch (Exception e){
-
+            for(int i = 0; i < masterList.size(); i++){
+                String nodeIp = masterList.get(i).get("ip").trim();
+                String nodePort = masterList.get(i).get("port");
+                if( (StringUtils.isBlank(nodeIp) || StringUtils.isBlank( nodePort )) ||
+                        (nodeIp.equals(ip) && nodePort.equals(String.valueOf(port))) ){
+                    continue;
+                }
+                Jedis jedis = null;
+                try {
+                    jedis = new Jedis( nodeIp, Integer.parseInt(nodePort));
+                    jedis.clusterForget( nodeId );
+                }catch ( Exception e ){
+                    logger.error("", e );
+                }finally {
+                    if( null != jedis ){
+                        jedis.close();
+                    }
+                }
+                // forget 自己的信息
+                myselef.clusterReset(JedisCluster.Reset.HARD);
+            }
+        }catch ( Exception e ){
+            logger.error("", e );
         }finally {
-            jedis.close();
+            myselef.close();
         }
-        return res;
+        return true;
     }
 
     public boolean clusterMeet(String slaveIp, int slavePort, String masterIp, int masterPort){
@@ -138,25 +162,24 @@ public class RedisManager {
         return res;
     }
 
-    public Map<RedisNode, List<RedisNode>>  buildClusterMeet(Map<RedisNode, List<RedisNode>> ipMap){
+    public Map<RedisNode, List<RedisNode>>  buildClusterMeet(int clusterId, Map<RedisNode, List<RedisNode>> ipMap){
+        Cluster cluster = clusterLogic.getCluster( clusterId );
+        Host host = NetUtil.getHostPassAddress( cluster.getAddress() );
         Map<RedisNode, List<RedisNode>> ipMapRes = new HashedMap();
-        String currentAliableIp = null;
-        Integer currentAliablePort = null;
+        String currentAliableIp = host.getIp();
+        Integer currentAliablePort = host.getPort();
         for(Map.Entry< RedisNode, List<RedisNode> > nodeItem : ipMap.entrySet() ){
             try {
                 RedisNode master = nodeItem.getKey();
                 String masterIp = master.getIp();
                 int masterPort = master.getPort();
                 if( NetUtil.checkIpAndPort(masterIp, masterPort) ){
-                    if( StringUtils.isBlank( currentAliableIp ) || null == currentAliablePort ){
-                        currentAliableIp = masterIp;
-                        currentAliablePort = masterPort;
-                    }
                     List<RedisNode> slaveList = nodeItem.getValue();
                     ipMapRes.put(master, slaveList);
+                    clusterMeet( masterIp, masterPort, currentAliableIp, currentAliablePort );
                     for(RedisNode redisNode : slaveList){
                         logger.websocket( redisNode.getIp() + ":" + redisNode.getPort() + " is meet cluster");
-                        clusterMeet( redisNode.getIp(), redisNode.getPort(), currentAliableIp, currentAliablePort );
+                        clusterMeet( redisNode.getIp(), redisNode.getPort(), masterIp, masterPort );
                         Thread.sleep(500);
                     }
                 }else{
@@ -191,9 +214,9 @@ public class RedisManager {
         return true;
     }
 
-    public boolean buildCluster(Map<RedisNode, List<RedisNode>> ipMap){
+    public boolean buildCluster(int clusterId, Map<RedisNode, List<RedisNode>> ipMap){
         logger.websocket("start meet all node to cluster");
-        buildClusterMeet( ipMap );
+        buildClusterMeet(clusterId, ipMap );
         logger.websocket("start set slave for cluster");
         buildClusterBeSlave( ipMap );
         return true;

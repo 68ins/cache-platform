@@ -1,6 +1,5 @@
 package com.newegg.ec.cache.app.controller;
 
-import com.newegg.ec.cache.app.controller.security.WebSecurityConfig;
 import com.newegg.ec.cache.app.model.Common;
 import com.newegg.ec.cache.core.userapi.UserAccess;
 import com.newegg.ec.cache.app.logic.UserLogic;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class UserController {
     private UserLogic logic;
 
     @RequestMapping("/login")
-    public String form(Model model){
+    public String login(Model model){
         return "login";
     }
 
@@ -46,7 +44,7 @@ public class UserController {
 
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
     @ResponseBody
-    public Response addUser(@RequestBody User user, Cluster cluster){
+    public Response addUser(@RequestBody User user){
         boolean res = logic.addUser( user );
         return Response.Result(0, res);
     }

@@ -9,6 +9,8 @@ import com.newegg.ec.cache.plugin.INodeOperate;
 import com.newegg.ec.cache.plugin.basemodel.Node;
 import com.newegg.ec.cache.plugin.basemodel.NodeRequestPram;
 import com.newegg.ec.cache.plugin.basemodel.PluginType;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -121,8 +123,28 @@ public class NodeController {
         nodeOperate = nodeManager.factoryOperate( nodeRequestPram.getPluginType() );
         boolean res = nodeOperate.pullImage( nodeRequestPram.getReq() );
         if( res ){
-            return Response.Result(Response.DEFAULT, res);
+            return Response.Success();
         }
         return Response.Warn("pull image is fail");
+    }
+
+    @RequestMapping(value = "/humpbacknodeCheckAccess", method = RequestMethod.POST)
+    @ResponseBody
+    public Response humpbacknodeCheckAccess(@RequestBody JSONObject reqPram){
+        String checkRes = nodeManager.humpbackManager.checkAccess( reqPram );
+        if( StringUtils.isBlank( checkRes ) ){
+            return Response.Success();
+        }
+        return Response.Error( checkRes );
+    }
+
+    @RequestMapping(value = "/dockernodeCheckAccess", method = RequestMethod.POST)
+    @ResponseBody
+    public Response dockernodeCheckAccess(@RequestBody JSONObject reqPram){
+        String checkRes = nodeManager.dockerManager.checkAccess( reqPram );
+        if( StringUtils.isBlank( checkRes ) ){
+            return Response.Success();
+        }
+        return Response.Error( checkRes );
     }
 }

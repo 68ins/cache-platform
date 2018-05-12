@@ -4,20 +4,20 @@
         <th>Id</th>
         <th>Status</th>
         <th>InCluster</th>
-        <th>Image Version</th>
+        <th>Image</th>
         <th>Username</th>
         <th>Password</th>
         <th>Ip</th>
         <th>Port</th>
-        <th>User Group</th>
-        <th>Install Path</th>
+        <th>Group</th>
+        <th>Path</th>
         <th>AddTime</th>
         <th>Operation</th>
     </tr>
     </thead>
     <tbody>
     {{foreach from=$res item=node}}
-         <tr id="node-{{$node.id}}" data-detail={{json_format node=$node}}>
+         <tr id="node-{{$node.id}}" data-detail={{json_format node=$node}} data-status="">
              <td>{{$node.id}}</td>
              <td id="status-{{$node.id}}">{{service_status  ip=$node.ip port=$node.port id=$node.id}}</td>
              <td id="in-cluster-{{$node.id}}">{{in_cluster ip=$node.ip port=$node.port id=$node.id}}</td>
@@ -37,6 +37,7 @@
                              <li>
                                  <a href="javascript:void(0)" data-id="{{$node.id}}" class="option-button delete-node">Delete</a>
                                  <a href="javascript:void(0)" data-id="{{$node.id}}" class="option-button restart-node">Restart</a>
+                                 <a href="javascript:void(0)" data-id="{{$node.id}}" class="option-button import-node-to-cluster">import to cluster</a>
                              </li>
                          </ul>
                      </div>
