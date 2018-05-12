@@ -34,7 +34,7 @@
         .chart-sm{
             height: 200px;
             width: 450px;
-            margin-top: 20px;
+            margin: 10px 0px;
         }
     </style>
 </head>
@@ -116,8 +116,9 @@
                     <div class="panel panel-default my-panel">
                         <div class="panel-heading">
                             <div>
-                                <span class="label-success cluster-info">Cluster Healthy</span>
-                                Cluster nodes: <b class="label-success">2</b> | Master Size: <b class="label-success">1</b>
+                                <span id="cluster-state"></span>
+
+                                Cluster Nodes: <b class="label-info" id="cluster-nodes-number"></b> | Master Size: <b class="label-info" id="master-number"></b>
                             </div>
                             <div class="panel-heading-right">
                                 <div class="btn-group">
@@ -139,36 +140,36 @@
                             <ul>
                                 <li>
                                     <span class="info-header-container">
-                                        <span class="glyphicon glyphicon-hourglass info"></span>
-                                        <span class="title">响应时间 : <span id="avg-response">1</span>/ms</span>
+                                        <i class="glyphicon glyphicon-hourglass info"></i>
+                                        <span class="title">响应时间 : <span id="avg-response"></span>/ms</span>
                                     </span>
                                     <div id="top-response-time">
                                     </div>
                                 </li>
                                 <li>
                                     <span class="info-header-container">
-                                        <span class="glyphicon glyphicon-piggy-bank info"></span>
-                                        <span class="title">Key总数 : <span id="all-key">931001</span></span>
+                                        <i class="glyphicon glyphicon-piggy-bank info"></i>
+                                        <span class="title">Key总数 : <span id="all-key"></span></span>
                                     </span>
                                     <div id="top-connection">
-                                        <p class="top-item">Max: <span class="top_request_monitor" id="max-all-key">931026</span>
+                                        <p class="top-item">Max: <span class="top_request_monitor" id="max-all-key"></span>
                                         </p>
-                                        <p class="top-item">Min: <span class="top_request_monitor" id="min-all-key">930976</span>
+                                        <p class="top-item">Min: <span class="top_request_monitor" id="min-all-key"></span>
                                         </p>
                                     </div>
                                 </li>
                                 <li>
                                     <span class="info-header-container">
-                                        <span class="glyphicon glyphicon-transfer info"></span>
-                                        <span class="title">连接数 : <span id="avg-connection">147</span></span>
+                                        <i class="glyphicon glyphicon-transfer info"></i>
+                                        <span class="title">连接数 : <span id="avg-connection"></span></span>
                                     </span>
                                     <div  id="top-avg-connection">
                                     </div>
                                 </li>
                                 <li>
                                     <span class="info-header-container">
-                                        <span class="glyphicon glyphicon-transfer info"></span>
-                                        <span class="title">每秒操作数 : <span id="avg-instantaneous">147</span></span>
+                                        <i class="glyphicon glyphicon-cog"></i>
+                                        <span class="title">每秒操作数 : <span id="avg-instantaneous"></span></span>
                                     </span>
                                     <div  id="top-avg-instantaneous">
                                     </div>
@@ -184,8 +185,8 @@
                             <div>
                                 <span>Detail Charts</span>
                                 <span class="instance-type">
-                                    <span>Instance: </span><span id="instance"></span>
-                                    <span>Type: </span><span id="data-type"></span>
+                                    <span>Instance: </span><span id="instance" class="label-info"></span>
+                                    <span class="margin-left-10">Type: </span><span id="data-type" class="label-info"></span>
                                 </span>
                             </div>
                         </div>

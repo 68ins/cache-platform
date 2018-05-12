@@ -268,3 +268,11 @@ nav.sw-toolbar.sw-toolbar-bottom{ display:none; }
 textarea{
     max-height: 200px;
 }
+
+.margin-left-10 {
+    margin-left: 10px;
+}
+
+.icon-margin {
+    margin-right: 8px;
+}

@@ -27,8 +27,6 @@ smarty.get( "/user/listGroup", "monitor/monitor_list", "group-classify", functio
    /* console.log("get...");*/
 }, true );
 
-
-
 $(document).on("click", ".list-active", function(res){
     var group = $(this).data("group");
     var isGetData = $(this).attr("aria-expanded");

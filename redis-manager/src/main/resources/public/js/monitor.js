@@ -73,7 +73,7 @@ $("#nodeList").on('changed.bs.select', function (e){
 })
 
 $("body").delegate(".top_request_monitor", "click", function(){
-    var host = $(this).text();
+    var host = $(this).attr("title") || "all";
     window.host = host;
     reloadMonitor();
 });
@@ -148,6 +148,18 @@ function reloadMonitor(){
 }
 
 function init(){
+    // cluster info for state
+    getClusterInfoByAddress(window.address, function(obj){
+        var clusterInfo = obj.res;
+        var state = clusterInfo.cluster_state;
+        if(state == "ok"){
+            $("#cluster-state").html('<span class="label-success cluster-info">Cluster Healthy</span>');
+        } else {
+            $("#cluster-state").html('<span class="label-danger cluster-info">Cluster Bad</span>');
+        }
+        $("#cluster-nodes-number").text(clusterInfo.cluster_known_nodes);
+        $("#master-number").text(clusterInfo.cluster_size);
+    })
     monitorGetMaxField(window.clusterId ,window.startTime,window.endTime,"response_time", 2,function(obj){
         var resList = obj.res;
         var topListStr = "";
@@ -164,10 +176,12 @@ function init(){
         $("#all-key").html( obj.res );
     });
     monitorGetMaxField(window.clusterId ,window.startTime,window.endTime,"total_keys", 2,function(obj){
-        $("#max-all-key").html( obj.res.total_keys );
+        $("#max-all-key").attr("title", obj.res[0].host)
+        $("#max-all-key").html( obj.res[0].total_keys );
     });
     monitorGetMinField(window.clusterId ,window.startTime,window.endTime,"total_keys", 2,function(obj){
-        $("#min-all-key").html( obj.res.total_keys );
+        $("#min-all-key").attr("title", obj.res[0].host)
+        $("#min-all-key").html( obj.res[0].total_keys );
     });
 
     monitorGetMaxField(window.clusterId ,window.startTime,window.endTime,"connected_clients", 2,function(obj){
@@ -198,7 +212,10 @@ function init(){
 
    monitorGetGroupNodeInfo(window.clusterId ,window.startTime,window.endTime,window.host,window.type,window.date,function(obj){
         var storageUnit = calculationStorageUnit(obj.res[0].usedMemory);
+        console.log("------------");
+        console.log(obj.res);
         var usefulData = refactor(obj.res,window.date,storageUnit);
+        console.log(usefulData);
         buildChart("charts-cpu","CPU占用率","date","usedCpuUser",obj.res,"CPU usage"," %/s");
         buildChart("charts-memory","内存占用","date","usedMemory",obj.res,"memory usage", storageUnit);
         buildChart("charts-client","客户端连接数","date","connectedClients",obj.res,"client connections"," ");
@@ -284,6 +301,9 @@ function refactor(originData,timeUnit,storageUnit){
 
         // 计算 获得有用的 统计值
         thisRecord.keyspaceHitRate = (thisRecord.keyspaceHits/(parseInt(thisRecord.keyspaceHits) + parseInt(thisRecord.keyspaceMisses))).toFixed(2);
+        if(isNaN(thisRecord.keyspaceHitRate )){
+            thisRecord.keyspaceHitRate = 0.0;
+        }
 
         // 存储单位换算 获得有用的 统计值
         if (storageUnit == 'KB'){
@@ -327,9 +347,7 @@ function refactor(originData,timeUnit,storageUnit){
 
     }
     originData.shift();
-    console.log(originData);
     return originData;
-
 }
 
 
@@ -436,85 +454,5 @@ function slowLog(){
     });
 }
 
-function makeCharts(theme, bgColor, field, char_data_table) {
-    var len = char_data_table.length;
-    var chart1;
-    if (chart1) {
-        chart1.clear();
-    }
-    // background
-    if (document.body) {
-        document.body.style.backgroundColor = bgColor;
-    }
-
-    // column chart
-    chart1 = AmCharts.makeChart("node-info-chart", {
-        type: "serial",
-        theme: theme,
-        dataProvider: char_data_table,
-        categoryField: "date",
-        startDuration: 1,
-        categoryAxis: {
-            gridPosition: "start"
-        },
-        valueAxes: [{
-            title: "Metric"
-        }],
-        graphs: [{
-            type: "column",
-            title: field,
-            valueField: field,
-            lineAlpha: 0,
-            fillAlphas: 0.8,
-            balloonText: "[[title]] in [[category]]  <b>[[value]]</b>"
-        }],
-        colors:	["#81b3b9"]
-    });
-}
-
-function makeCharts_core(id_document,chart_title,field,char_data_table){
-
-    // column chart
-    AmCharts.makeChart(id_document, {
-        type: "serial",
-        theme: "light",
-        "titles": [{
-            "text": chart_title
-        }],
-        dataProvider: char_data_table,
-        categoryField: "date",
-        startDuration: 1,
-        categoryAxis: {
-            gridPosition: "start"
-        },
-        valueAxes: [{
-            title: ""
-        }],
-          "balloon": {
-            "borderThickness": 1,
-            "shadowAlpha": 0
-          },
-        graphs: [{
-            "id": "g1",
-            "balloon": {
-              "drop": true,
-              "adjustBorderColor": false,
-              "color": "#ffffff",
-              "type": "smoothedLine"
-            },
-            "fillAlphas": 0.2,
-            "bullet": "round",
-            "bulletBorderAlpha": 1,
-            "bulletColor": "#FFFFFF",
-            "bulletSize": 5,
-            "hideBulletsCount": 50,
-            "lineThickness": 2,
-            "useLineColorForBulletBorder": true,
-            valueField: field,
-            balloonText: "<b>[[value]]</b>"
-        }],
-        colors:	["#81b3b9"]
-    });
-}
 
 

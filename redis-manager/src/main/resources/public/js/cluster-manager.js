@@ -161,7 +161,6 @@ smarty.register_function( 'cluster_status', function(params){
     }else {
         return "<span class='label-danger'>Cluster Bad</span> ";
     }
-
 });
 
 

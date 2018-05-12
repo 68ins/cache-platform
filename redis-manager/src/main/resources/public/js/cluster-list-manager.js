@@ -9,9 +9,9 @@ smarty.register_function( 'cluster_state', function( params ){
     getClusterInfoByAddress(address, function(obj){
         var state = obj.res.cluster_state;
         if(state == "ok"){
-            $("#" + div_id).html( "<span>State:&nbsp</span><span class='state-ok'>OK</span>" );
+            $("#" + div_id).append( "<span class='state-ok'>OK</span>" );
         } else {
-            $("#" + div_id).html( "<span>State:&nbsp</span><span class='state-fail'>Fail</span>" );
+            $("#" + div_id).append( "<span class='state-fail'>Fail</span>" );
         }
 
     });
@@ -112,8 +112,9 @@ $("#save").on("click", function(){
 $("body").delegate(".delete-container","click", function(){
     var deleteObj = $(this).parent().parent();
     var clusterId = $(this).attr("data-cluster-id");
+    var clusterName = deleteObj.attr("data");
     bootbox.prompt({
-        title: "Please enter the cluster name what you will delete",
+        title: "Please enter the cluster name what you will delete\n["+clusterName+"]",
         buttons: {
             confirm: {
                 label: 'Delete',
@@ -124,7 +125,7 @@ $("body").delegate(".delete-container","click", function(){
             }
         },
         callback: function (result){
-            var clusterName = deleteObj.attr("data");
+
             console.log("clusterId" + clusterId)
             if(result != null && result != "") {
                 if(result == clusterName) {
