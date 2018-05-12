@@ -52,6 +52,9 @@ $(document).on("click", ".cluster-info-detail", function(res){
             }
         });
     }, true );
+    /*monitorGetAvgField(clusterId, "total_keys",function(obj){
+        $("#all-key-" + clusterId).html(obj.res);
+    });*/
 });
 
 

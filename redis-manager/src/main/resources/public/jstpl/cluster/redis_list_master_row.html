@@ -1,13 +1,21 @@
 {{if $masterid != $clusterNodes.nodeId && $nodeid != $clusterNodes.nodeId && $clusterNodes.nodeId != null}}
     {{if !empty($clusterNodes.slaveList)}}
-        <td class="expand pointer expand-td" data-slave-index="{{$index}}" data-show="true" style="border-bottom:1px solid #ddd"> <span class="glyphicon glyphicon-minus"></span> </td>
+        <td class="expand pointer expand-td" data-slave-index="{{$index}}" data-show="true" style="border-bottom:1px solid #ddd">
+            <span class="glyphicon glyphicon-minus"></span>
+        </td>
     {{else}}
         <td></td>
     {{/if}}
     <td>{{node_status_tag status=$clusterNodes.status index=$index}}</td>
-    <td>{{$clusterNodes.role}} <span class="badge hidden" id="expand-slave-{{$index}}"> slave:{{if !empty($clusterNodes.slaveList)}}{{$clusterNodes.slaveList.length}}{{/if}}</span></td>
+    <td>{{$clusterNodes.role}}
+        <span class="badge hidden" id="expand-slave-{{$index}}">
+            slave:{{if !empty($clusterNodes.slaveList)}}{{$clusterNodes.slaveList.length}}{{/if}}
+        </span>
+    </td>
     <td>{{$clusterNodes.host}}</td>
-    <td><a href="javascript:void(0)" id="{{$clusterNodes.nodeId}}" data-ip="{{$clusterNodes.ip}}" data-port="{{$clusterNodes.port}}" class="node-info">{{$clusterNodes.nodeId}}</a></td>
+    <td>
+        <a href="javascript:void(0)" id="{{$clusterNodes.nodeId}}" data-ip="{{$clusterNodes.ip}}" data-port="{{$clusterNodes.port}}" class="node-info">{{$clusterNodes.nodeId}}</a>
+    </td>
     <td>
     {{$clusterNodes.slot}}{{slot_num slots=$clusterNodes.slot size=$res.clusterInfo.cluster_size index=$index}}
     </td>

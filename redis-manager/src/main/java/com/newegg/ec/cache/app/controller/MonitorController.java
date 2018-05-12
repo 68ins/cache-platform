@@ -30,7 +30,7 @@ public class MonitorController {
 
     @RequestMapping(value = "/clusterMonitor")
     public String clusterMonitor(Model model){
-        return "monitor2";
+        return "monitor";
     }
 
     @RequestMapping("/clusterMonitorList")

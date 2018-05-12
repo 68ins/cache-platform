@@ -1,4 +1,4 @@
-html,body {
+html, body, table{
 	padding: 0px;
 	margin: 0px;
 	height: 100%;
@@ -50,6 +50,13 @@ a, a:hover{
 	font-size: 24px;
 	display: flex;
 	align-items: center;
+}
+
+.panel-heading, .panel-heading-right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
 }
 
 .data-container{
@@ -225,6 +232,22 @@ a, a:hover{
     color: #FFFFFF;
 }
 
+.label-success, .label-danger, .label-info {
+    color: #FFFFFF;
+    padding: 1px 5px;
+}
+
+.label-success {
+    background-color: #41cac0;
+}
+
+.label-danger {
+    background-color: #ff6c60;
+}
+
+.label-info {
+    background-color: #57c8f2;
+}
 /*color*/
 
 .info-color {

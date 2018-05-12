@@ -45,13 +45,6 @@
 }
 
 /*cluster or one node base info*/
-.label-success {
-    background-color: #41cac0;
-    /*background-color: #5cb85c;*/
-    color: #FFFFFF;
-    padding: 0 5px;
-}
-
 .cluster-info {
     cursor: pointer;
 }
@@ -62,13 +55,6 @@
 
 .dropdown-menu li a {
     padding: 3px 10px;
-}
-
-.panel-heading, .panel-heading-right {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: none;
 }
 
 .query-container {
@@ -100,11 +86,12 @@
 	background-color: white;
 }
 
-.info-container {
+.info-header-container {
 	display: flex;
 	align-items: center;
 	font-size:20px;
     padding: 10px 10px 10px 18px;
+    margin-bottom: 15px;
     color: #FFFFFF;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
@@ -112,7 +99,7 @@
 }
 
 .title {
-    margin-left: 5px;
+    margin-left: 15px;
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -137,12 +124,17 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    padding-left: 25px;
+    padding-left: 55px;
+    font-size: 16px;
 }
 
 .top_request_monitor{
     cursor:pointer;
     color: #3fa7dc;
+}
+
+.instance-type {
+    margin-left: 20px;
 }
 
 .base-info-list a {
@@ -168,10 +160,9 @@
     max-height:400px;
 }
 
-
 /*slow log*/
 .slow-log-container{
-	margin: 20px 0 0 15px;
+	margin: 20px 0 10px;
 }
 
 .log-table-wrapper {
