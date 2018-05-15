@@ -8,7 +8,6 @@ $(document).ready(function(){
     window.address = ""
     getCluster(window.clusterId, function(obj){
         window.address = obj.res.address;
-        console.log(window.address);
         init();
     })
     $('th[data-field="responseTime"]').trigger("click");
@@ -131,7 +130,6 @@ $("#config").on("click", function(){
     var host = window.host;
     if(host != "all" && host != "" && host != null){
         smarty.fopen( "/cluster/getRedisConfig?address="+window.address, "cluster/redis_format", true, { title: "Config", area: '800px', type: 1, closeBtn: 1, anim: 2, shadeClose: true},  function(obj){
-        console.log(obj)
         } );
     } else {
         layer.msg("Please select one node");
@@ -231,9 +229,7 @@ $("#field-title > th").click(function () {
         $(this).addClass("selected");
         ajax.async_get("/monitor/getGroupNodeInfo?clusterId=" + window.clusterId + "&startTime="+ window.startTime +"&endTime=" + window.endTime + "&host=" + window.host + "&type=" + window.type + "&date=" + window.date, function(obj){
             makeCharts("light", "#FFFFFF", field, obj.res);
-            console.log(obj.res)
             smarty.html( "monitor/node_info_table", obj, "node-info-table",function () {
-                console.log("html ...");
             });
         });
     }
@@ -248,7 +244,6 @@ function slowLog(){
     $("#slow-log-table>tbody").empty();
     var logParam = {};
     var logNode = $("#logNodeList").selectpicker("val");
-    console.log(logNode)
     if(logNode == "all"){
         logParam.hostList = window.nodeList;
     } else {

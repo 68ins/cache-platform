@@ -28,7 +28,6 @@ $('[href="#clusterManager"]').click(function () {
 
 function show_cluster_node_list(address){
     smarty.get( "/cluster/detailNodeList?address=" + address, "cluster/cluster_manager_content", "clusterManager", function(){
-            console.log("get...");
     }, true );
 }
 
@@ -269,7 +268,6 @@ $(document).on("click", "#import-node", function(){
             var data = sparrow_form.encode( "import-node-form",0 ); //0 表示所有字段都提交， 2 表示有改变的才提交
             if ( sparrow.empty( data ) )
             {
-                console.log(data);
                 return false;
             }
             var address =  window.cluster.address;
@@ -290,7 +288,6 @@ $(document).on("click", "#batch-config", function(){
             var data = sparrow_form.encode( "batch-config-form",0 ); //0 表示所有字段都提交， 2 表示有改变的才提交
             if ( sparrow.empty( data ) )
             {
-                console.log(data);
                 return false;
             }
             var address =  window.cluster.address;

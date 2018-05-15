@@ -8,7 +8,6 @@ $(document).ready(function(){
     window.address = "";
     getCluster(window.clusterId , function(obj){
         window.address = obj.res.address;
-        console.log(window.address);
         init();
     })
     $(".start-time").flatpickr();
@@ -131,7 +130,6 @@ $("#config").on("click", function(){
     var host = window.host;
     if(host != "all" && host != "" && host != null){
         smarty.fopen( "/cluster/getRedisConfig?address="+window.address, "cluster/redis_format", true, { title: "Config", area: '800px', type: 1, closeBtn: 1, anim: 2, shadeClose: true},  function(obj){
-        console.log(obj)
         } );
     } else {
         layer.msg("Please select one node");
@@ -212,10 +210,7 @@ function init(){
 
    monitorGetGroupNodeInfo(window.clusterId ,window.startTime,window.endTime,window.host,window.type,window.date,function(obj){
         var storageUnit = calculationStorageUnit(obj.res[0].usedMemory);
-        console.log("------------");
-        console.log(obj.res);
         var usefulData = refactor(obj.res,window.date,storageUnit);
-        console.log(usefulData);
         buildChart("charts-cpu","CPU占用率","date","usedCpuUser",obj.res,"CPU usage"," %/s");
         buildChart("charts-memory","内存占用","date","usedMemory",obj.res,"memory usage", storageUnit);
         buildChart("charts-client","客户端连接数","date","connectedClients",obj.res,"client connections"," ");
@@ -226,8 +221,6 @@ function init(){
     });
 
     getCluster(window.clusterId , function(obj){
-        console.log(window.clusterId)
-        console.log(obj)
         $("#clusterName").html(obj.res.clusterName);
     });
 
@@ -426,7 +419,6 @@ function slowLog(){
     $("#slow-log-table>tbody").empty();
     var logParam = {};
     var logNode = $("#logNodeList").selectpicker("val");
-    console.log(logNode)
     if(logNode == "all"){
         logParam.hostList = window.nodeList;
     } else {

@@ -3,10 +3,8 @@ $(document).ready(function(){
     window.clusterId = getQueryString("clusterId");
     getCluster(clusterId, function(obj){
         var cluster = obj.res;
-        console.log(cluster)
         nodeList(cluster.address, function(obj){
             window.nodeList = obj.res;
-            console.log(nodeList)
             rebuildNodeListTable( clusterId );
         });
     });
@@ -15,7 +13,6 @@ $(document).ready(function(){
 function rebuildNodeListTable(){
     smarty.get( "/node/getNodeList?pluginType="+ window.pluginType  +"&clusterId=" + window.clusterId , "plugin/" + window.pluginType + "/" + window.pluginType + "_mode_manager", "node-list", function(){
         $("table").dataTable({});
-        console.log("build table");
     }, true );
 }
 
@@ -35,7 +32,6 @@ $(document).on("click", ".start-node", function(){
     }
     layer.alert("Confirm start the node", {icon: 6, time: 1000},function(){
         nodeStart(reqParam, function(obj){
-            console.log(obj);
         });
     });
 });

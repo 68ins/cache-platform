@@ -7,7 +7,6 @@ $(document).ready(function(){
 
 function init_install_ui(clusterId){
     getImageList(window.pluginType, function(obj){
-        console.log( obj );
         var userGroup = window.user.userGroup || "";
         var groupList = [];
         if( userGroup != "" ){
@@ -29,11 +28,9 @@ $(document).on("click", "#start-install-cluster", function(obj){
             "pluginType": window.pluginType,
             "req": installParam
         }
-        console.log( param );
         nodePullImage( param, function(obj){
             if( obj.code ==  0 ){
                 nodeInstall( param, function(obj){
-                    console.log( obj.res );
                 });
             }
         });
@@ -49,7 +46,6 @@ function  createClusterStep( data, clusterId){
                 var cluster = obj.res;
                 $("[name='clusterName']").val( cluster.clusterName );
                 $("[name='clusterName']").attr("disabled","disabled");
-                console.log( cluster );
             });
         }
         autosize(document.querySelectorAll('textarea'));

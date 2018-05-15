@@ -8,5 +8,5 @@ for i in *.jar; do
         CLASSPATH=${CLASSPATH}:${i}
 done
 echo ${CLASSPATH}
-java -cp ${CLASSPATH} com.newegg.ec.cache.MachineManagerServer >> logs/start.log 2>&1 < /dev/null &
+java -cp ${CLASSPATH} com.newegg.ec.cache.MachineManagerServer >> ../logs/start.log 2>&1 < /dev/null &
 echo $! > pid

@@ -4212,7 +4212,6 @@ if (debugMode === 1) {
 else if (debugMode > 1) {
     log = function () {
         for (var k in arguments) {
-            console.log(arguments[k]);
         }
     };
 }

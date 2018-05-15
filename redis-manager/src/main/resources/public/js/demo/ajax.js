@@ -1,11 +1,11 @@
 $("#sync-ajax").click(function(){
     ajax.post("/demo/ajaxPost", JSON.stringify({"code": 0}),function(res){
-        console.log(res);
     },true);
 });
 
 $("#async-ajax").click(function(){
-    ajax.async_post("/demo/ajaxPost", {"code": 0},function(res){console.log(res);});
+    ajax.async_post("/demo/ajaxPost", {"code": 0},function(res){
+    });
 });
 
 
