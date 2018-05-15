@@ -12,8 +12,8 @@
 > 安装过程需要的各种依赖项
 
 1. cd ${you_project_dir} 通过终端进入到你的工程目录
-2. mvn dependency:copy-dependencies -DoutputDirectory=target/lib -DincludeScope=runtime  生成 jar 包，这个时候您可以到 target 目录查看到 lib 包
-3. mvn package  将 MachineManager 打成 jar 包
+2. mvn clean; mvn dependency:copy-dependencies -DoutputDirectory=target/lib -DincludeScope=runtime  生成 jar 包，这个时候您可以到 target 目录查看到 lib 包
+3. mvn package -Dmaven.test.skip=true  将 MachineManager 打成 jar 包
 
 ### 2.2 部署
 1. 在您的服务器上新建目录 /opt/app/machine-manager
