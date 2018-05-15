@@ -49,4 +49,4 @@ controller 映射成前端js
       └── logs 日志目录
       └── redis-manager.jar 这个是 MachineManager 的 jar 包
 ```
-3. 启动服务 ./bin/start.sh 这个时候您可以 ****:**** 查看主页
+3. 启动服务 ./bin/start.sh 这个时候您可以 127.0.0.1:8182 查看主页
