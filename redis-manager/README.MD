@@ -42,12 +42,12 @@ controller 映射成前端js
 1. 在您的服务器上新建目录 /opt/app/redis-manager
 2. 生成如下目录
 ```
-├── /opt/app/machine-manager
+├── /opt/app/redis-manager
       └── bin  这个文件您可以在上层目录上找到，您只需要修改对应的类名
       └── conf 这个是您项目的 resource 文件
       └── lib 这个是上面过程打的 lib 包
       └── logs 日志目录
-      └── redis-manager.jar 这个是 MachineManager 的 jar 包
+      └── redis-manager.jar 这个是 RedisManager 的 jar 包
 ```
 3. 启动服务 ./bin/start.sh 这个时候您可以 127.0.0.1:8182 查看主页，如图：
 <img src="./docs/images/index.png" />
