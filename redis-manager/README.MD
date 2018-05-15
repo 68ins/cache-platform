@@ -7,7 +7,7 @@
 │   └── redis-manager.sql         // 关联的 sql
 ├── pom.xml
 ├── src.main.java.com.newegg.ec.cache
-    └── becnckend                    // 后台任务，包括定时检测集群问题task,redis monitor 获取
+    └── backend                    // 后台任务，包括定时检测集群问题task,redis monitor 获取
     └── core                         // 核心层（日志、注解、异常...）
     └── plugin                       // 插件层
             └── docker               // docker 相关
