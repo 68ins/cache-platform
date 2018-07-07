@@ -1,4 +1,5 @@
-smarty.get( "/cluster/listCluster?group=admin", "cluster/cluster_list_content", "cluster-list-content", function(){
+smarty.get( "/cluster/listCluster", "cluster/cluster_list_content", "cluster-list-content", function(){
+       /* console.log("get...");*/
 }, true );
 
 smarty.register_function( 'cluster_state', function( params ){
@@ -17,7 +18,7 @@ smarty.register_function( 'cluster_state', function( params ){
 });
 
 $(document).on("click", "#add-cluster", function(){
-    smarty.open( "cluster/add_cluster_model", {}, { title: "Add New Cluster", width:400, height:305},function(){
+    smarty.open( "cluster/add_cluster_model", {}, { title: "Add New Cluster", width:400, height:345},function(){
 
     });
 });
@@ -46,10 +47,12 @@ $("#save").on("click", function(){
     var clusterNameObj = $("#clusterName");
     var addressObj = $("#address");
     var groupIdObj = $("#group");
+    var redisPasswordObj = $("#redisPassword");
 
     var clusterName = clusterNameObj.val().trim();
     var address = addressObj.val().trim();
     var userGroup = $("#group option:selected").val().trim();
+    var redisPassword = redisPasswordObj.val().trim();
 
     if(clusterName == null || clusterName == ""){
         clusterNameObj.addClass("input-error");
@@ -76,6 +79,7 @@ $("#save").on("click", function(){
     cluster.address = address;
     cluster.userGroup =  userGroup;
     cluster.clusterType = "machine";
+    cluster.redisPassword = redisPassword;
     addCluster(cluster, function(obj){
         location.reload();
     });
@@ -124,6 +128,8 @@ $("body").delegate(".delete-container","click", function(){
             }
         },
         callback: function (result){
+
+            console.log("clusterId" + clusterId)
             if(result != null && result != "") {
                 if(result == clusterName) {
                     //TODO: ajax request
@@ -133,11 +139,11 @@ $("body").delegate(".delete-container","click", function(){
                         dataType: "json",
                         contentType : "application/json; charset=utf-8",
                         success: function(result){
+                            console.log(result);
                             var code = parseInt(result.code);
                             if(code == 0) {
                                  deleteObj.remove();
-                                 layer.msg("delete " + clusterName + " successfully")
-                                 /*setTimeout("location.reload()", 1000);*/
+                                 layer.msg("delete " + clusterName + " successfully") 
                             } else {
                                 layer.msg("delete " + clusterName + " failed")
                             }

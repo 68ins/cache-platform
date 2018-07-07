@@ -8,6 +8,7 @@ $(document).ready(function(){
     window.address = "";
     getCluster(window.clusterId , function(obj){
         window.address = obj.res.address;
+        console.log(window.address);
         init();
     })
     $(".start-time").flatpickr();
@@ -107,19 +108,9 @@ $(".cluster-info").on("click", function(){
 $("#info").on("click", function(){
     var host = window.host;
     if(host != "all" && host != "" && host != null){
-        getNodeInfo(host, function(obj){
-            var info = obj.res;
-            layer.open({
-                title: 'Info',
-                type: 1,
-                area: '800px',
-                skin: 'layui-layer-demo', //样式类名
-                closeBtn: 1, //显示关闭按钮
-                anim: 2,
-                shadeClose: true, //开启遮罩关闭
-                content: '<pre style="padding: 20px; border: none;">'+ syntaxHighlightRedisResult( obj.res ) +'</pre>'
-            });
-        })
+        smarty.fopen( "/cluster/getNodeInfo?address="+ host, "cluster/info_format", true, { title: "Info", area: '800px', type: 1, closeBtn: 1, anim: 2, shadeClose: true},  function(obj){
+            console.log(obj)
+        } );
     } else {
         layer.msg("Please select one node");
     }
@@ -129,17 +120,13 @@ $("#info").on("click", function(){
 $("#config").on("click", function(){
     var host = window.host;
     if(host != "all" && host != "" && host != null){
-        smarty.fopen( "/cluster/getRedisConfig?address="+window.address, "cluster/redis_format", true, { title: "Config", area: '800px', type: 1, closeBtn: 1, anim: 2, shadeClose: true},  function(obj){
+        smarty.fopen( "/cluster/getRedisConfig?address="+ host, "cluster/config_format", true, { title: "Config", area: '800px', type: 1, closeBtn: 1, anim: 2, shadeClose: true},  function(obj){
+            console.log(obj)
         } );
     } else {
         layer.msg("Please select one node");
     }
 })
-
-smarty.register_function( 'format_redis_result', function( params ){
-    var content = params['content'];
-    return syntaxHighlightRedisResult( content );
-});
 
 function reloadMonitor(){
     window.location.href = "/monitor/clusterMonitor?clusterId="+window.clusterId +"&startTime=" + window.startTime + "&endTime="+window.endTime + "&host=" + window.host + "&type=" + window.type + "&date=" + window.date;
@@ -170,8 +157,10 @@ function init(){
         $("#avg-response").html( obj.res );
     });
 
-    monitorGetAvgField(window.clusterId ,window.startTime,window.endTime,window.host, "total_keys",function(obj){
-        $("#all-key").html( obj.res );
+    monitorGetDbSize(window.address,function(obj){
+        if( obj.res ){
+            $("#all-key").html( Math.round(obj.res) );
+        }
     });
     monitorGetMaxField(window.clusterId ,window.startTime,window.endTime,"total_keys", 2,function(obj){
         $("#max-all-key").attr("title", obj.res[0].host)
@@ -192,7 +181,9 @@ function init(){
     });
 
     monitorGetAvgField(window.clusterId ,window.startTime,window.endTime,window.host, "connected_clients",function(obj){
-        $("#avg-connection").html( obj.res );
+        if( obj.res ){
+            $("#avg-connection").html( Math.round(obj.res) );
+        }
     });
 
     monitorGetMaxField(window.clusterId ,window.startTime,window.endTime,"instantaneous_ops_per_sec", 2,function(obj){
@@ -205,7 +196,9 @@ function init(){
     });
 
     monitorGetAvgField(window.clusterId ,window.startTime,window.endTime,window.host, "instantaneous_ops_per_sec",function(obj){
-        $("#avg-instantaneous").html( obj.res );
+        if( obj.res ){
+            $("#avg-instantaneous").html( Math.round(obj.res) );
+        }
     });
 
    monitorGetGroupNodeInfo(window.clusterId ,window.startTime,window.endTime,window.host,window.type,window.date,function(obj){
@@ -416,7 +409,7 @@ $("#logNodeList").on('changed.bs.select', function (e) {
 })
 // slow log function
 function slowLog(){
-    $("#slow-log-table>tbody").empty();
+    $("#slow-log-table").empty();
     var logParam = {};
     var logNode = $("#logNodeList").selectpicker("val");
     if(logNode == "all"){
@@ -425,6 +418,8 @@ function slowLog(){
         var ipAndPort = logNode.split(":");
         logParam.hostList = [{"ip":ipAndPort[0], "port": parseInt(ipAndPort[1])}];
     }
+    var tableStr = '<table class="table table-bordered scrollbar">';
+    tableStr += "<thead><tr><th>Host</th><th>Slow Date</th><th>Run Time</th><th>Type</th><th>command</th></tr></thead><tbody>"
     monitorSlowLogs(logParam,function(obj){
         var items = obj.res;
         var tr = "";
@@ -437,8 +432,10 @@ function slowLog(){
             tr += "<td>" + items[index].command + "</td>";
             tr += "</tr>";
         }
-        $("#slow-log-table>tbody").append( tr );
-        $("#slow-log-table").dataTable({
+        tableStr += tr;
+        tableStr += "</tbody></table>";
+        $("#slow-log-table").append( tableStr );
+        $("#slow-log-table>table").dataTable({
             pageLength:15,
             lengthMenu: [15, 30, 50, 100, 200, 300 ],
             order: [[ 1, 'asc' ]]

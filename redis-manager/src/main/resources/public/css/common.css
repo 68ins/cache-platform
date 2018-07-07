@@ -20,11 +20,6 @@ a, a:hover{
 	text-decoration: none;
 }
 
-.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
-    background-color: #3fa7dc;
-    border-color: #3fa7dc;
-}
-
 .body-container {
 	width: 100%;
     height: 100%;
@@ -237,21 +232,6 @@ a, a:hover{
     color: #FFFFFF;
 }
 
-.btn-success,
-.btn-success:focus,
-.btn-success:hover,
-.btn-success:active:hover,
-.btn-success:active:focus,
-.btn-success.active:focus,
-.btn-success.focus,
-.btn-success:active.focus,
-.btn-success:active.focus {
-    border: 1px solid #6ccac9;
-    outline: none;
-    background-color: #6ccac9;
-    color: #FFFFFF;
-}
-
 .label-success, .label-danger, .label-info {
     color: #FFFFFF;
     padding: 1px 5px;
@@ -295,4 +275,29 @@ textarea{
 
 .icon-margin {
     margin-right: 8px;
+}
+
+.sparrow-tip{
+    height:20px;
+}
+.sparrow-input-placeholder{
+    margin-left:15px;
+    color:#a69bb4;
+}
+
+.key-note{
+    width:700px;
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color: #908c8c;
+}
+
+td>a.redis-meta {
+    color: #26928b;
+    text-decoration: none;
+}
+.view-config{
+    margin-left:15px;
 }

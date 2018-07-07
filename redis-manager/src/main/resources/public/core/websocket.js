@@ -20,6 +20,7 @@ function connect(data, url) {
     };
 
     ws.onclose = function (event) {
+        console.log('Info: connection closed.');
         console.log(event);
     };
 }
@@ -27,6 +28,7 @@ function connect(data, url) {
 function disconnect() {
     if (ws != null) {
         ws.close();
+        console.log("close....!!");
         ws = null;
     }
 }
