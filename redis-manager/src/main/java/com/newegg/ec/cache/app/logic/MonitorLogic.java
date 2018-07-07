@@ -1,10 +1,12 @@
 package com.newegg.ec.cache.app.logic;
 
+import com.newegg.ec.cache.app.component.RedisManager;
 import com.newegg.ec.cache.app.dao.INodeInfoDao;
 import com.newegg.ec.cache.app.dao.impl.NodeInfoDao;
 import com.newegg.ec.cache.app.model.*;
 import com.newegg.ec.cache.app.util.DateUtil;
 import com.newegg.ec.cache.app.util.JedisUtil;
+import com.newegg.ec.cache.app.util.NetUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -21,6 +23,8 @@ import java.util.*;
  */
 @Component
 public class MonitorLogic {
+    @Resource
+    private RedisManager redisManager;
     @Resource
     private INodeInfoDao nodeDao;
 
@@ -52,7 +56,9 @@ public class MonitorLogic {
         List<RedisSlowLog>  cmdList = new ArrayList<>();
         List<Host> ipList = slowLogParam.getHostList();
         int logLimit = 0;
-        if( slowLogParam.getLogLimit() == 0 ){
+        if( ipList.size() > 800 ){
+            logLimit = 1;
+        }else if( slowLogParam.getLogLimit() == 0 ){
             logLimit = 800/ipList.size();
         }
         for(Host host1 : ipList){
@@ -80,5 +86,11 @@ public class MonitorLogic {
             }
         }
         return cmdList;
+    }
+
+    public int getDbSize(String address) {
+        Host host = NetUtil.getHostPassAddress(address);
+        int size = redisManager.getDbSize(host.getIp(), host.getPort());
+        return size;
     }
 }

@@ -9,23 +9,27 @@ $(document).ready(function(){
 $("#html-tpl").click(function(){
     var req = {"code":"001", "msg":"msg001","res":"","id":12};
     smarty.html( "demo/parent", req, "node-list-div",function () {
+        console.log("html ...");
     });
 });
 
 
 $("#get-tpl").click(function(){
     smarty.get( "/demo/getList", "demo/parent", "node-list-div", function(){
+        console.log("get...");
     }, true );
 });
 
 $("#post-tpl").click(function(){
     var req = {"code":"001", "msg":"msg001","res":""};
     smarty.post( "/demo/postList", req, "demo/parent", "node-list-div", function(res){
+        console.log("post....");
     }, true );
 });
 
 $("#popen-tpl").click(function(){
     smarty.open( "demo/popen", {"id":12}, { title: "title", width:330, height:270},function(){
+        console.log("popen....");
     });
 });
 

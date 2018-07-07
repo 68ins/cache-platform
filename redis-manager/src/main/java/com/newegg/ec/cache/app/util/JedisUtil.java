@@ -153,7 +153,13 @@ public class JedisUtil {
 
 
     public static int getDbIndex(String db) {
-        int index = Integer.parseInt(db);
+        int index = 0;
+        if( db.contains("db") ){
+            String tmp = db.substring(2);
+            index = Integer.parseInt(tmp);
+        }else{
+            index = Integer.parseInt(db);
+        }
         return index;
     }
 
@@ -210,7 +216,7 @@ public class JedisUtil {
      * @param port
      * @return
      */
-    private static List<Map<String, String>> getNodeList (String ip, int port, boolean filterMaster) {
+    public static List<Map<String, String>> getNodeList(String ip, int port, boolean filterMaster) {
         Map<String, Map> result = new HashMap<>();
         if( filterMaster ){
             result = JedisUtil.getMasterNodes(ip, port);
@@ -305,7 +311,7 @@ public class JedisUtil {
         return result;
     }
 
-    private static Map<String,Map> getMasterNodes (String ip, int port) {
+    public static Map<String,Map> getMasterNodes (String ip, int port) {
         Jedis jedis = new Jedis( ip, port);
         Map<String, Map> result = new HashMap<>();
         try {

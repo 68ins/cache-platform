@@ -3,13 +3,19 @@ $(document).ready(function(){
     window.clusterId = getQueryString("clusterId");
     getCluster(window.clusterId, function(obj){
         window.cluster = obj.res;
+        getClusterInfoByAddress( window.cluster.address, function(obj){
+            console.log( obj.res );
+            if( obj.res.cluster_slots_ok == 0 ){
+                sparrow_win.confirm("the cluster is not slot can you init it", function(){
+                    initSlot( window.cluster.address, function( obj ){
+                        console.log( obj );
+                    });
+                });
+            }
+        });
         checkRedisVersion(window.cluster.address,function(obj){
             if( obj.res  == 2 ){
-                layer.alert( "redis version only support monitor", {
-                  icon: 1,
-                  skin: 'layer-ext-moon',
-                  title: 'redis version'
-                },function(){
+                sparrow_win.confirm("redis version only support monitor", function(){
                     window.location.href = "/monitor/clusterMonitorList";
                 });
             }
@@ -28,6 +34,8 @@ $('[href="#clusterManager"]').click(function () {
 
 function show_cluster_node_list(address){
     smarty.get( "/cluster/detailNodeList?address=" + address, "cluster/cluster_manager_content", "clusterManager", function(){
+        // 默认展开
+        //$(".expand-all").trigger("click");
     }, true );
 }
 
@@ -268,8 +276,10 @@ $(document).on("click", "#import-node", function(){
             var data = sparrow_form.encode( "import-node-form",0 ); //0 表示所有字段都提交， 2 表示有改变的才提交
             if ( sparrow.empty( data ) )
             {
+                console.log(data);
                 return false;
             }
+            layer.closeAll();
             var address =  window.cluster.address;
             var hostArr = address.split(",");
             var tmps = hostArr[0].split(":");
@@ -288,8 +298,10 @@ $(document).on("click", "#batch-config", function(){
             var data = sparrow_form.encode( "batch-config-form",0 ); //0 表示所有字段都提交， 2 表示有改变的才提交
             if ( sparrow.empty( data ) )
             {
+                console.log(data);
                 return false;
             }
+            layer.closeAll();
             var address =  window.cluster.address;
             var hostArr = address.split(",");
             var tmps = hostArr[0].split(":");
@@ -303,14 +315,36 @@ $(document).on("click", "#batch-config", function(){
 });
 
 $(document).on("click", ".be-master", function(){
-    var data = {};
-    data["ip"] = $(this).data("ip");
-    data["port"] = $(this).data("port");
+    var ip = $(this).data("ip");
+    var port = $(this).data("port");
     sparrow_win.confirm('Confirm set the node master',function(){
         beMaster(ip,port,function(){
             sparrow_win.msg("be master");
         });
      });
+});
+
+$(document).on("click", ".move-slot", function(){
+    var ip = $(this).data("ip");
+    var port = $(this).data("port");
+    smarty.open( "cluster/move_slot", {}, { title: "Move Slot",  width:330, height:270},function(){
+        $("#move-slot-confirm").click(function(){
+            var data = sparrow_form.encode( "move-slot-form",0 );
+            if ( sparrow.empty( data ) ){
+                return false;
+            }
+            layer.closeAll();
+            var startKey = data["startKey"];
+            var endKey = data["endKey"];
+            moveSlot(ip,port,startKey,endKey,function(obj){
+                if( obj.code == 0 ){
+                    sparrow_win.msg("success!");
+                }else{
+                    sparrow_win.msg("fail!");
+                }
+            });
+        });
+    });
 });
 
 $(document).on("click", ".forget-node", function(){
@@ -338,10 +372,25 @@ $(document).on("click", ".be-slave", function(){
     var address = ip + ":" + port;
     smarty.fopen( "/cluster/detailNodeList?address=" + address, "cluster/be_slave", true, { title: "Select master for move slave " + ip + ":" + port, width:1000, height:580}, function(){
         $(".move-slave-confirm").click(function(){
+            layer.closeAll();
             var masterId = $(this).data("nodeid");
             beSlave(ip,port,masterId, function(){
-                sparrow_win.msg("import to...");
+                sparrow_win.msg("move slave ...");
             });
         });
     });
+});
+
+$(document).on("click", ".node-info", function(){
+    var host = $(this).data("ip") + ":" + $(this).data("port");
+    smarty.fopen( "/cluster/getNodeInfo?address="+ host, "cluster/info_format", true, { title: "Info", area: '800px', type: 1, closeBtn: 1, anim: 2, shadeClose: true},  function(obj){
+        console.log(obj)
+    } );
+});
+
+$(document).on("click", ".view-config", function(){
+    var host = $(this).data("ip") + ":" + $(this).data("port");
+    smarty.fopen( "/cluster/getRedisConfig?address="+ host, "cluster/config_format", true, { title: "Config", area: '800px', type: 1, closeBtn: 1, anim: 2, shadeClose: true},  function(obj){
+        console.log(obj)
+    } );
 });

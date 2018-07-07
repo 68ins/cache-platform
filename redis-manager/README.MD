@@ -1,53 +1,73 @@
 # RedisManager
-> redis manager  spring jpa， 页面共用模块设计
 
-```  代码结构
-├── README.MD
-├── docs                             // 文档目录
-│   └── redis-manager.sql         // 关联的 sql
-├── pom.xml
-├── src.main.java.com.newegg.ec.cache
-    └── backend                    // 后台任务，包括定时检测集群问题task,redis monitor 获取
-    └── core                         // 核心层（日志、注解、异常...）
-    └── plugin                       // 插件层
-            └── docker               // docker 相关
-            └── humback              // humback 相关
-            └── machine              // 物理机相关
-    └── app                          // redis-manager 应用
-            └── component            // 一个是节点管理组件，另一个是 redis 管理组件
-            └── controller           // 程序路由接口
-            └── dao                  // 数据处理层
-            └── logic                // 逻辑处理层
-            └── model                // 实体层
-    └── Application                  // 程序入口
-```
+[![Build Status](https://travis-ci.org/ngbdf/redis-manager.svg?branch=master)](https://travis-ci.org/ngbdf/redis-manager)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
+RedisManager 是  redis 一站式管理平台。 支持集群的创建、管理、监控。      
+集群的创建包含了三种方式 docker、machine、humpback;集群的管理支持 slot迁移、master slave 角色的选举、动态配置的修改;监控部分有 redis info、 slow log;集群之间数据同步;以及可以查询任意类型的query接口。
+
+[快速开始](https://github.com/ngbdf/redis-manager/wiki/)     
+
+## 联系方式
+> 您在使用产品的过程中如果遇到问题或者需要改进的地方可以通过以下两种方式直接联系我们
+
+1. RedisManager讨论群      
+[![Join the chat at https://gitter.im/dianping/cat](https://badges.gitter.im/dianping/cat.svg)](https://gitter.im/redis-manager/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
+2. RedisManager微信群     
+ <img src="./docs/images/wechat.png" width="200px"/>
+
+## 产品截图
+> 截图部分包含了 创建模块、管理模块、监控模块、集群同步、query客户端的使用，详情如下:
+### 1 创建集群
+> 创建集群包含了三种选择、您可以选择机器安装也可以选择 docker 或 humpback
+<img src="./docs/images/create.png"/>
+
+### 2 管理集群
+> 管理集群分为 ClusterManager、NodeManager 两部分
+
+#### 2.1 ClusterManager
+> 集群管理主要包好了 slot 迁移、master slave 角色切换、动态配置
+<img src="./docs/images/cluster-manager.png"/>
+
+#### 2.2 NodeManager
+> 节点管理主要包含了节点的启动关闭重启扩容等
+<img src="./docs/images/node-manager.png"/>
+
+### 3 redis监控
+> 监控包含了 redis info 和 slow log 两个部分的内容
+
+### 3.1 监控列表
+<img src="./docs/images/monitor-list.png"/>
+
+### 3.2 具体监控详情
+<img src="./docs/images/monitor-detail.png"/>
+
+### 4 集群数据同步
+> 集群同步原理：scan 数据源集群并读取对应的 key-value,写入到目标数据源，目前支持（string, hash,list,set）类型的数据，具体操作如下
+<img src="./docs/images/cluster-sync.png"/>
+
+### 5 Query客户端
+> 支持任意类型的 key 查询，包含 scan功能
+<img src="./docs/images/query.png"/>
+	
+## 用户手册
+> 用户手册主要介绍如何使用 redisManager
+
+0. [如何启动项目](https://github.com/ngbdf/redis-manager/wiki/如何启动项目)
+1. [如何创建集群](https://github.com/ngbdf/redis-manager/wiki/如何创建集群)
+2. [如何管理或监控一个已存在的集群](https://github.com/ngbdf/redis-manager/wiki/如何管理或监控一个已存在的集群)
+3. [如何管理集群](https://github.com/ngbdf/redis-manager/wiki/如何管理集群)
+4. [如何管理节点](https://github.com/ngbdf/redis-manager/wiki/如何管理节点)
+5. [如何查看监控](https://github.com/ngbdf/redis-manager/wiki/如何查看监控)
+6. [query功能介绍](https://github.com/ngbdf/redis-manager/wiki/query功能介绍)
+
+## 产品设计
+> 设计文档主要介绍 redisMangaer 架构设计、框架设计
+
+1. [代码结构介绍](https://github.com/ngbdf/redis-manager/wiki/代码结构介绍) 
+2. [监控数据的采集](https://github.com/ngbdf/redis-manager/wiki/监控数据的采集)
+
+## License
+RedisManager is Open Source software released under the  [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 
-### todo
-
-```
-controller 映射成前端js
-集群安装日志
-配置文件读取
-```
-
-## 安装方式
-### 安装准备
-1. cd ${you_project_dir} 通过终端进入到你的工程目录
-2. mvn clean; 
-3.mvn dependency:copy-dependencies -DoutputDirectory=target/lib -DincludeScope=runtime  生成 jar 包，这个时候您可以到 target 目录查看到 lib 包
-4. mvn package -Dmaven.test.skip=true，跳过 Test 类， 将 Redis Manager 打成 jar 包。
-
-### 项目部署
-1. 在您的服务器上新建目录 /opt/app/redis-manager
-2. 生成如下目录
-```
-├── /opt/app/redis-manager
-      └── bin  这个文件您可以在上层目录上找到，您只需要修改对应的类名
-      └── conf 这个是您项目的 resource 文件
-      └── lib 这个是上面过程打的 lib 包
-      └── logs 日志目录
-      └── redis-manager.jar 这个是 RedisManager 的 jar 包
-```
-3. 启动服务 ./bin/start.sh 这个时候您可以 127.0.0.1:8182 查看主页，如图：
-<img src="./docs/images/index.png" />
